@@ -1,8 +1,15 @@
-import React, { Component } from 'react';
+import React, { Component, cloneElement } from 'react';
+
+//dependencias
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import base64 from 'react-native-base64'
+//imagenes
 import bgImage from '../../images/imagenfondologin.jpg'
 import Logo from '../../images/logo-gn-representaciones.png'
+//funciones
+import { apiBasic } from '../../functions/api';
+
 
 class BodyLogin extends Component {
     constructor(props) {
@@ -11,19 +18,37 @@ class BodyLogin extends Component {
             user: '',
             pass: ''
         };
+        //sessionStorage.removeItem('token');
         this.handlePress = this.handlePress.bind(this);
+        //const urlApi = 'http://localhost:8000/api';
     }
 
-    handlePress = () => {
-        if (this.state.user !== '') {
-            alert('Datos Validos... Bienvenido!')
-            this.setState({
-                user: '',
-                pass: ''
-            })
-            this.props.navegar.navigate('Details')
-        } else {
-            alert('digite todos los datos')
+    handlePress = async () => {
+        try {
+            if (this.state.user !== '' && this.state.pass !== '') {
+                alert('Datos Validos... Bienvenido!')
+                this.setState({
+                    user: '',
+                    pass: ''
+                })
+                const conversion = this.state.user + ":"+this.state.pass;
+                const credenciales = await base64.encode(conversion);
+                const datos = await apiBasic('POST', 'auth-login/token', credenciales);
+                
+                console.log("datos = " + datos.accessToken);
+                console.log('user: ' + this.state.user +'- pass: ' + this.state.pass);
+                console.log(credenciales);
+
+                 if (datos.accessToken) {
+                    this.props.navegar.navigate('Details')
+                 } else {
+                    alert(datos.error);
+                 }                
+            } else {
+                alert('digite todos los datos')
+            }
+        } catch (error) {
+
         }
     }
 

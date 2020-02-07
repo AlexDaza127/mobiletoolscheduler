@@ -11,6 +11,6 @@ web-build/
 web-report/
 
 # node_modelues 
-.node_modelues
+.ToolsScheduler-Mobile\node_modules
 # macOS
 .DS_Store
