@@ -4,9 +4,11 @@ import React, { Component, cloneElement } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import base64 from 'react-native-base64'
+
 //imagenes
 import bgImage from '../../images/imagenfondologin.jpg'
 import Logo from '../../images/logo-gn-representaciones.png'
+
 //funciones
 import { apiBasic } from '../../functions/api';
 
@@ -26,13 +28,15 @@ class BodyLogin extends Component {
     handlePress = async () => {
         try {
             if (this.state.user !== '' && this.state.pass !== '') {
-                alert('Datos Validos... Bienvenido!')
+                
+                const conversion = this.state.user + ":"+ this.state.pass;
+                const credenciales = await base64.encode(conversion);
+                
                 this.setState({
                     user: '',
                     pass: ''
                 })
-                const conversion = this.state.user + ":"+this.state.pass;
-                const credenciales = await base64.encode(conversion);
+            
                 const datos = await apiBasic('POST', 'auth-login/token', credenciales);
                 
                 console.log("datos = " + datos.accessToken);
@@ -40,6 +44,7 @@ class BodyLogin extends Component {
                 console.log(credenciales);
 
                  if (datos.accessToken) {
+                    alert('Datos Validos... Bienvenido!')
                     this.props.navegar.navigate('Details')
                  } else {
                     alert(datos.error);
@@ -56,7 +61,7 @@ class BodyLogin extends Component {
         return (
             <ImageBackground source={bgImage} style={styles.backgroundContainer}>
                 <View style={styles.container}>
-                    <Image source={Logo} />
+                    <Image source={Logo}/>
                     <Text
                         style={[styles.alinear, styles.fontLetter]}>
                         Ingresar

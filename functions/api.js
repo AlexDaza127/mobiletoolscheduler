@@ -1,9 +1,8 @@
 async function request(method, url, body, auth) {
-
     try {
         console.log("por aqui pase")
         //URL de ambiente para hacer peticiones al back
-        const urlApi = 'http://localhost:8000/api';
+        const urlApi = 'http://192.168.0.4:8000/api';
 
         //Opciones de petición
         const requestOptions = {
@@ -19,18 +18,10 @@ async function request(method, url, body, auth) {
         if (method.toUpperCase() !== 'GET') {
             requestOptions.body = JSON.stringify(body);
         }
-        console.log("Authorization = "+ requestOptions.headers["Authorization"]);
-        console.log("Content_Type = " + requestOptions.headers["Content-Type"])
-        console.log("Body = " + requestOptions.headers["body"])
-        console.log("requestOptions.body = " + requestOptions.body)
-
-        //Se realiza petición
-        ////////////////////////////////////////////////////////////////////////// es el fetch
-        console.log("fetch = " + `${urlApi}/${url}`+","+ requestOptions)
-        let response = await fetch(`${urlApi}/${url}`, requestOptions);
-        console.log("response = " + response.json());
-        //Se recibe respuesta y se transforma en JSON
-        let datos = await response.json();
+        
+        const response = await fetch(`${urlApi}/${url}`, requestOptions);
+        
+        const datos = await response.json();
         return datos;
     }
     catch (error) {
