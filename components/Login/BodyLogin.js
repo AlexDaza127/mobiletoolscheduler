@@ -20,9 +20,8 @@ class BodyLogin extends Component {
             user: '',
             pass: ''
         };
-        //sessionStorage.removeItem('token');
+
         this.handlePress = this.handlePress.bind(this);
-        //const urlApi = 'http://localhost:8000/api';
     }
 
     handlePress = async () => {

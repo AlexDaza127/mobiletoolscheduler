@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View, Text, Button } from 'react-native';
 
 //componentes
 import BodyLogin from '../components/Login/BodyLogin'
@@ -16,9 +18,27 @@ function Login({ navigation }) {
 function Landing({ navigation }) {
     return (
         <BodyLanding navegar={navigation}></BodyLanding>
+
     );
 }
 
+function otras(){
+    return(
+        <View>
+            <Text>Hola mundo!</Text>
+        </View>
+    );
+}
+function gestorLandings() {
+    return (
+        <Tab.Navigator>
+            <Tab.Screen name="Landing" component={Landing} />
+            <Tab.Screen name="otras" component={otras} />
+        </Tab.Navigator>
+    );
+}
+
+const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 
@@ -34,7 +54,7 @@ function Routes() {
                     }} />
                 <Stack.Screen
                     name="Details"
-                    component={Landing} />
+                    component={gestorLandings} />
             </Stack.Navigator>
         </NavigationContainer>
     );
