@@ -1,6 +1,6 @@
 async function request(method, url, body, auth) {
     try {
-        console.log("por aqui pase")
+       //console.log("por aqui pase")
         //URL de ambiente para hacer peticiones al back
         const urlApi = 'http://192.168.0.3:8000/api';
 
@@ -25,7 +25,7 @@ async function request(method, url, body, auth) {
         return datos;
     }
     catch (error) {
-        console.log(error);
+        //console.log(error);
         return {
             estado: false,
             mensaje: 'Error al realizar petición'

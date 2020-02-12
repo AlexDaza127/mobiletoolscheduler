@@ -14,9 +14,8 @@ class BodyLanding extends Component {
         }
     }
 
-    _alertIndex(index) {
-        //Alert.alert(`This is row ${index + 3}`);
-        <FormatoServicio></FormatoServicio>
+    funcionesServicios() {
+        this.props.navegar.navigate('formatoS');
     }
 
     render() {
@@ -27,7 +26,7 @@ class BodyLanding extends Component {
             for (let j = 0; j < 4; j += 1) {
                 //rowData.push(`${i}${j}`);
                 rowData.push( j === 3 ?
-                    <TouchableOpacity onPress={() => this._alertIndex(j)}>
+                    <TouchableOpacity onPress={() => this.funcionesServicios()}>
                         <View style={styles.btn}>
                             <Text style={styles.text}><Ionicons  name="md-checkmark-circle" size={28}></Ionicons ></Text>
                         </View>
@@ -36,14 +35,6 @@ class BodyLanding extends Component {
             }
             tableData.push(rowData);
         }
-
-        // function element(){
-        //     <TouchableOpacity onPress={() => this._alertIndex(index)}>
-        //         <View style={styles.btn}>
-        //             <Text style={styles.btnText}><MaterialIcons name='pluscircleo'></MaterialIcons>button</Text>
-        //         </View>
-        //     </TouchableOpacity>
-        // }
 
         return (
             <ScrollView>
@@ -72,7 +63,6 @@ class BodyLanding extends Component {
                                         ))
                                     }
                                 </Table>
-
                             </ScrollView>
                         </View>
                     </ScrollView>
