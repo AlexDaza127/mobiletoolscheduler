@@ -38,9 +38,9 @@ class BodyLogin extends Component {
             
                 const datos = await apiBasic('POST', 'auth-login/token', credenciales);
                 
-                console.log("datos = " + datos.accessToken);
-                console.log('user: ' + this.state.user +'- pass: ' + this.state.pass);
-                console.log(credenciales);
+                // console.log("datos = " + datos.accessToken);
+                // console.log('user: ' + this.state.user +'- pass: ' + this.state.pass);
+                // console.log(credenciales);
 
                  if (datos.accessToken) {
                     alert('Datos Validos... Bienvenido!')

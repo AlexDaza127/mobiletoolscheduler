@@ -2,6 +2,7 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons } from '@expo/vector-icons';
 import { View, Text, Button } from 'react-native';
 
 //componentes
@@ -22,18 +23,39 @@ function Landing({ navigation }) {
     );
 }
 
-function otras(){
-    return(
-        <View>
-            <Text>Hola mundo!</Text>
-        </View>
-    );
-}
+// function otras(){
+//     return(
+//         <View>
+//             <Text>Hola mundo!</Text>
+//         </View>
+//     );
+// }
+
 function gestorLandings() {
     return (
-        <Tab.Navigator>
-            <Tab.Screen name="Landing" component={Landing} />
-            <Tab.Screen name="otras" component={otras} />
+        <Tab.Navigator
+        screenOptions={({ route }) => ({
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+    
+              if (route.name === 'Atender Servicio') {
+                iconName = focused ? 'ios-information-circle' : 'ios-information-circle-outline';
+              } 
+            //   else if (route.name === 'otras') {
+            //     iconName = focused ? 'ios-list-box' : 'ios-list';
+            //   }
+    
+              // You can return any component that you like here!
+              return <Ionicons name={iconName} size={30} color={color} />;
+            },
+          })}
+          tabBarOptions={{
+            activeTintColor: '#343a40',
+            inactiveTintColor: 'gray',
+          }}
+        >
+            <Tab.Screen name="Atender Servicio" component={Landing} />
+            {/* <Tab.Screen name="otras" component={otras} /> */}
         </Tab.Navigator>
     );
 }
