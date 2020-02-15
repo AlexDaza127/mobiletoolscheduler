@@ -25,12 +25,13 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.yourappname",
+      "bundleIdentifier": "com.toolsschedulermobile.toolsschedulermobile",
       "buildNumber": "1.0.0"
     },
-    "android":{
-      "package" : "com.toolsschedulermobile.toolsschedulermobile",
-      "versionCode" : 1
-    }
+    "android": {
+      "package": "com.toolsschedulermobile.toolsschedulermobile",
+      "versionCode": 1
+    },
+    "description": ""
   }
 }

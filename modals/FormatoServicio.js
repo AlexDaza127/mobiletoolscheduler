@@ -9,38 +9,45 @@ import {
 class FormatoServicio extends Component {
     state = {
         modalVisible: true,
-        estado: '',
-        partes: '',
-        obra: '',
-        obs: '',
+        EstadoEquipo: '',
+        PartesReparar: '',
+        ManoObra: '',
+        RepuestosPartes: '',
+        AplicaCostoM: 0,
+        AplicaCostoPr: 0,
+        CostoM: '',
+        CostoPr: '',
+        CostoConcepM: 0,
+        CostoConcepPr: 0,
+        Observaciones: '',
+        FirmaEncargado: '',
+        loading: false,
+        checkedCostoM: false,
+        checkedCostoPr: false
     };
 
     setModalVisible(visible) {
         this.setState({
-            modalVisible: visible,
-            EstadoEquipo: '',
-            PartesReparar: '',
-            ManoObra: '',
-            RepuestosPartes: '',
-            AplicaCostoM: 0,
-            AplicaCostoPr: 0,
-            CostoM: '',
-            CostoPr: '',
-            CostoConcepM: 0,
-            CostoConcepPr: 0,
-            Observaciones: '',
-            FirmaEncargado: '',
-            loading: false,
-            checkedCostoM: false,
-            checkedCostoPr: false
-
-
+            modalVisible: visible
         });
         Alert.alert(`Se guardaron los datos correctamente`);
         this.props.navegar.navigate('Details')
     }
 
+    valorCostos(CostoConcepM) {
+        if (!this.state.checkedCostoM) {
+            this.setState({
+                AplicaCostoM: 0,
+                CostoConcepM: '',
+                CostoM: ''
+            });
+        } else {
+            this.setState({ CostoConcepM: CostoConcepM });
+        }
+    }
+
     render() {
+        console.log(this.state)
         return (
 
             <View>
@@ -54,32 +61,39 @@ class FormatoServicio extends Component {
                 >
                     <ScrollView>
                         <Text style={styles.title}>Formato de Servicio</Text>
+                        <Text style={styles.text}>Estado inicial del equipo</Text>
                         <TextInput
                             style={[styles.inputs, styles.alinear]}
                             placeholder="Estado inicial del equipo"
                             onChangeText={(EstadoEquipo) => this.setState({ EstadoEquipo })}
                             value={this.state.EstadoEquipo}
                         ></TextInput>
+
+                        <Text style={styles.text}>Partes a reparar</Text>
                         <TextInput
                             style={[styles.inputs, styles.alinear]}
                             placeholder="Partes a reparar"
                             onChangeText={(PartesReparar) => this.setState({ PartesReparar })}
                             value={this.state.PartesReparar}
                         ></TextInput>
+
+                        <Text style={styles.text}>Mano de Obra</Text>
                         <TextInput
                             style={[styles.inputs, styles.alinear]}
                             placeholder="Mano de Obra"
-                            keyboardType='email-address'
                             onChangeText={(ManoObra) => this.setState({ ManoObra })}
                             value={this.state.ManoObra}
                         ></TextInput>
+
+                        <Text style={styles.text}>Recursos/Partes Necesarias</Text>
                         <TextInput
                             style={[styles.inputs, styles.alinear]}
                             placeholder="Recursos/Partes Necesarias"
-                            keyboardType='email-address'
                             onChangeText={(RepuestosPartes) => this.setState({ RepuestosPartes })}
                             value={this.state.RepuestosPartes}
                         ></TextInput>
+
+                        <Text style={styles.text}>Observaciones</Text>
                         <TextInput
                             style={[styles.inputs, styles.alinear]}
                             placeholder="Observaciones"
@@ -87,54 +101,57 @@ class FormatoServicio extends Component {
                             value={this.state.Observaciones}
                         ></TextInput>
 
-
+                        {/* //////////////////////////////// */}
                         <Text style={styles.text}>Costos de Mantenimiento</Text>
                         <View style={styles.checks}>
                             <CheckBox
                                 value={this.state.checkedCostoM}
-                                onValueChange={() => this.setState({ checkedCostoM: !this.state.checkedCostoM })}
+                                onValueChange={() => this.setState({ checkedCostoM: !this.state.checkedCostoM, AplicaCostoM: 1 })}
                             >
                             </CheckBox>
                             <Text>¿Aplica costo?</Text>
                         </View>
+
                         <TextInput
                             style={[styles.inputs, styles.alinear]}
-                            placeholder="$0"
-                            keyboardType='email-address'
-                            onChangeText={(RepuestosPartes) => this.setState({ RepuestosPartes })}
-                            value={this.state.RepuestosPartes}
+                            placeholder='$0'
+                            keyboardType='numeric'
+                            onChangeText={(CostoConcepM) => this.setState({ CostoConcepM })}
+                            value={this.state.checkedCostoM ? this.state.CostoConcepM : ''}
                         ></TextInput>
                         <TextInput
                             style={[styles.inputs, styles.alinear]}
                             placeholder="Descripción del Costo"
-                            onChangeText={(Observaciones) => this.setState({ Observaciones })}
-                            value={this.state.Observaciones}
+                            onChangeText={(CostoM) => this.setState({ CostoM })}
+                            value={this.state.checkedCostoM ? this.state.CostoM : ''}
                         ></TextInput>
 
 
+                        {/* //////////////////////////////// */}
                         <Text style={styles.text}>Costos de Partes/Reparación</Text>
                         <View style={styles.checks}>
                             <CheckBox
                                 value={this.state.checkedCostoPr}
-                                onValueChange={() => this.setState({ checkedCostoPr: !this.state.checkedCostoPr})}
+                                onValueChange={() => this.setState({ checkedCostoPr: !this.state.checkedCostoPr, AplicaCostoPr: 1 })}
                             >
                             </CheckBox>
                             <Text>¿Aplica costo?</Text>
-                            
+
                         </View>
                         <TextInput
                             style={[styles.inputs, styles.alinear]}
-                            placeholder="$0"
-                            keyboardType='email-address'
-                            onChangeText={(RepuestosPartes) => this.setState({ RepuestosPartes })}
-                            value={this.state.RepuestosPartes}
+                            placeholder='$0'
+                            keyboardType='numeric'
+                            onChangeText={(CostoConcepPr) => this.setState({ CostoConcepPr })}
+                            value={this.state.checkedCostoPr ? this.state.CostoConcepPr : ''}
                         ></TextInput>
                         <TextInput
                             style={[styles.inputs, styles.alinear]}
                             placeholder="Descripción del Costo"
-                            onChangeText={(Observaciones) => this.setState({ Observaciones })}
-                            value={this.state.Observaciones}
+                            onChangeText={(CostoPr) => this.setState({ CostoPr })}
+                            value={this.state.checkedCostoPr ? this.state.CostoPr : ''}
                         ></TextInput>
+                        <Text style={styles.text}>Firma Cliente</Text>
                         <View>
                             <TouchableOpacity onPress={() => {
                                 this.setModalVisible(!this.state.modalVisible)

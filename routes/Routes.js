@@ -9,6 +9,7 @@ import { View, Text, Button } from 'react-native';
 import BodyLogin from '../components/Login/BodyLogin'
 import BodyLanding from '../components/Views/BodyLanding';
 import FormatoServicio from '../modals/FormatoServicio';
+import FormatoEntrega from '../modals/FormatoEntrega';
 
 
 function Login({ navigation }) {
@@ -20,6 +21,12 @@ function Login({ navigation }) {
 function formatoServicio({ navigation }) {
     return (
         <FormatoServicio navegar={navigation}></FormatoServicio>
+    );
+}
+
+function formatoEntrega({ navigation }) {
+    return (
+        <FormatoEntrega navegar={navigation}></FormatoEntrega>
     );
 }
 
@@ -51,7 +58,7 @@ function gestorLandings() {
                     //   else if (route.name === 'otras') {
                     //     iconName = focused ? 'ios-list-box' : 'ios-list';
                     //   }
-                    
+
                     return <Ionicons name={iconName} size={30} color={color} />;
                 },
             })}
@@ -86,6 +93,9 @@ function Routes() {
                 <Stack.Screen
                     name="formatoS"
                     component={formatoServicio} />
+                <Stack.Screen
+                    name="formatoE"
+                    component={formatoEntrega} />
             </Stack.Navigator>
         </NavigationContainer>
     );

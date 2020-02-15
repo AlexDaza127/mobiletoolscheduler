@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Modal, StyleSheet, View, ScrollView, TouchableOpacity, Alert, Text, Button } from 'react-native';
 import { Table, TableWrapper, Row } from 'react-native-table-component';
-import { Ionicons  } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import FormatoServicio from '../../modals/FormatoServicio';
 
 
@@ -9,13 +9,17 @@ class BodyLanding extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            tableHead: ['N° Solicitud', 'Cliente', 'Sede', 'Detalles'],
+            tableHead: ['N° Solicitud', 'Cliente', 'Sede', 'Gestionar'],
             widthArr: [100, 100, 100, 100]
         }
     }
 
-    funcionesServicios() {
-        this.props.navegar.navigate('formatoS');
+    solicitudGestiones(i) {
+        if (i === 2) {
+            this.props.navegar.navigate('formatoS');
+        } else {
+            this.props.navegar.navigate('formatoE');
+        }
     }
 
     render() {
@@ -25,10 +29,10 @@ class BodyLanding extends Component {
             const rowData = [];
             for (let j = 0; j < 4; j += 1) {
                 //rowData.push(`${i}${j}`);
-                rowData.push( j === 3 ?
-                    <TouchableOpacity onPress={() => this.funcionesServicios()}>
+                rowData.push(j === 3 ?
+                    <TouchableOpacity onPress={() => this.solicitudGestiones(i)}>
                         <View style={styles.btn}>
-                            <Text style={styles.text}><Ionicons  name="md-checkmark-circle" size={28}></Ionicons ></Text>
+                            <Text style={styles.text}><MaterialCommunityIcons name="teach" size={28}></MaterialCommunityIcons >{i}</Text>
                         </View>
                     </TouchableOpacity> : `${i}${j}`
                 );
