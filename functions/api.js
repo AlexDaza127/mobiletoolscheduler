@@ -2,7 +2,7 @@ async function request(method, url, body, auth) {
     try {
        //console.log("por aqui pase")
         //URL de ambiente para hacer peticiones al back
-        const urlApi = 'http://192.168.0.7:8000/api';
+        const urlApi = 'http://192.168.0.11:8000/api';
 
         //Opciones de petición
         const requestOptions = {

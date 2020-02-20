@@ -9,8 +9,8 @@ class BodyLanding extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            tableHead: ['N° Solicitud', 'Cliente', 'Sede', 'Gestionar'],
-            widthArr: [100, 100, 100, 100]
+            tableHead: ['N° Solicitud', 'Cliente', 'Sede', 'Dirección', 'Persona de Contacto','Número','Fecha','Serial','Marca', 'Referencia','Tipo de Solicitud','Gestionar'],
+            widthArr: [200, 200, 200, 200,200, 200, 200, 200,200, 200, 200, 200]
         }
     }
 
@@ -25,11 +25,11 @@ class BodyLanding extends Component {
     render() {
         const state = this.state;
         const tableData = [];
-        for (let i = 0; i < 12; i += 1) {
+        for (let i = 0; i < 10; i += 1) {
             const rowData = [];
-            for (let j = 0; j < 4; j += 1) {
+            for (let j = 0; j < 15; j += 1) {
                 //rowData.push(`${i}${j}`);
-                rowData.push(j === 3 ?
+                rowData.push(j === 11 ?
                     <TouchableOpacity onPress={() => this.solicitudGestiones(i)}>
                         <View style={styles.btn}>
                             <Text style={styles.text}><MaterialCommunityIcons name="teach" size={28}></MaterialCommunityIcons >{i}</Text>

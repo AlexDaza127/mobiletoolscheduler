@@ -10,6 +10,9 @@ import BodyLogin from '../components/Login/BodyLogin'
 import BodyLanding from '../components/Views/BodyLanding';
 import FormatoServicio from '../modals/FormatoServicio';
 import FormatoEntrega from '../modals/FormatoEntrega';
+import SignatureCliente from '../functions/SignatureCliente';
+import SignatureClienteServ from '../functions/SignatureClienteServicio';
+
 
 
 function Login({ navigation }) {
@@ -18,15 +21,30 @@ function Login({ navigation }) {
     );
 }
 
-function formatoServicio({ navigation }) {
+function formatoServicio({ route,navigation }) {
+    const { firma } = route.params;
     return (
-        <FormatoServicio navegar={navigation}></FormatoServicio>
+       
+        <FormatoServicio navegar={navigation}  rutas={{ firma }}></FormatoServicio>
     );
 }
 
-function formatoEntrega({ navigation }) {
+function firmaCliente({ navigation }) {
     return (
-        <FormatoEntrega navegar={navigation}></FormatoEntrega>
+        <SignatureCliente navegar={navigation}></SignatureCliente>
+    );
+}
+
+function firmaClienteServicio({ navigation }) {
+    return (
+        <SignatureClienteServ navegar={navigation}></SignatureClienteServ>
+    );
+}
+
+function formatoEntrega({ route, navigation }) {
+    const { firma } = route.params;
+    return (
+        <FormatoEntrega navegar={navigation} rutas={{ firma }}></FormatoEntrega>
     );
 }
 
@@ -36,14 +54,6 @@ function Landing({ navigation }) {
 
     );
 }
-
-// function otras(){
-//     return(
-//         <View>
-//             <Text>Hola mundo!</Text>
-//         </View>
-//     );
-// }
 
 function gestorLandings() {
     return (
@@ -55,9 +65,6 @@ function gestorLandings() {
                     if (route.name === 'Atender Servicio') {
                         iconName = focused ? 'ios-information-circle' : 'ios-information-circle-outline';
                     }
-                    //   else if (route.name === 'otras') {
-                    //     iconName = focused ? 'ios-list-box' : 'ios-list';
-                    //   }
 
                     return <Ionicons name={iconName} size={30} color={color} />;
                 },
@@ -68,7 +75,6 @@ function gestorLandings() {
             }}
         >
             <Tab.Screen name="Atender Servicio" component={Landing} />
-            {/* <Tab.Screen name="otras" component={otras} /> */}
         </Tab.Navigator>
     );
 }
@@ -92,10 +98,20 @@ function Routes() {
                     component={gestorLandings} />
                 <Stack.Screen
                     name="formatoS"
-                    component={formatoServicio} />
+                    component={formatoServicio}
+                    initialParams={{ firma: null }} />
                 <Stack.Screen
                     name="formatoE"
-                    component={formatoEntrega} />
+                    component={formatoEntrega}
+                    initialParams={{ firma: null }} />
+                <Stack.Screen
+                    name="firmaC"
+                    component={firmaCliente}
+                />
+                <Stack.Screen
+                    name="firmaCS"
+                    component={firmaClienteServicio}
+                />
             </Stack.Navigator>
         </NavigationContainer>
     );

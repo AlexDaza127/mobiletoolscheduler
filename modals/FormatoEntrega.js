@@ -1,38 +1,56 @@
 import React, { Component } from 'react';
-import {
-    Modal, Text, View, Alert, StyleSheet,
+import {Text, View, Alert, StyleSheet,
     TouchableOpacity, TextInput, ScrollView, CheckBox, Image
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
-import { FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-
-
+import { FontAwesome } from '@expo/vector-icons';
 
 class FormatoEntrega extends Component {
+
     state = {
         idMaquinaSede: '',
         TipoMaquina: '',
         Marca: '',
         Referencia: '',
         Serial: '',
-        FotoSerial: '',
-        FirmaEncargado: '',
-        Status: '',
-        NoInst: false,
+        FotoSerial: null,
+        FirmaEncargado: null,
+        Status: '',//pendiente del checkbox
+        NoInst: false, //pendiente del checkbox
         loading: false,
         checkedCostoM: false,
         checkedCostoPr: false,
         image: null
     };
 
-    setModalVisible(visible) {
+
+    //metodo que permite capturar la firma 
+    handleSignature = () => {
+        this.props.navegar.navigate('firmaC');
+
+    };
+
+    cargarFirma = () => {
+        const { firma } = this.props.rutas;
         this.setState({
-            modalVisible: visible
-        });
-        Alert.alert(`Se guardaron los datos correctamente`);
-        this.props.navegar.navigate('Details')
+            FirmaEncargado: firma
+        }, () => { });
+    }
+
+    cargarDatos() {
+        if (this.state.TipoMaquina !== '' &&
+            this.state.Marca !== '' &&
+            this.state.Referencia !== '' &&
+            this.state.FirmaEncargado !== null &&
+            this.state.Serial !== '') {
+            Alert.alert(`Se guardaron los datos correctamente`);
+            this.props.navegar.navigate('Details')
+        } else {
+            Alert.alert(`Faltan campos por validar!`);
+        }
+
     }
 
     componentDidMount() {
@@ -56,125 +74,128 @@ class FormatoEntrega extends Component {
         });
 
         if (!result.cancelled) {
-            this.setState({ image: result.uri});
+            this.setState({ image: result.uri });
         }
     };
 
     render() {
-        let { image } = this.state;
+        console.log(this.state)
         return (
-
             <View>
-                <Modal
-                    animationType="slide"
-                    transparent={false}
-                    visible={this.state.modalVisible}
-                    onRequestClose={() => {
-                        Alert.alert('Guarde los cambios antes de salir');
-                    }}
-                >
-                    <ScrollView>
+                <ScrollView>
+                    <Text style={styles.title}>Formato de Entrega</Text>
 
-                        <Text style={styles.title}>Formato de Entrega</Text>
+                    <Text style={styles.text}>Tipo de Máquina</Text>
+                    <TextInput
+                        style={[styles.inputs, styles.alinear]}
+                        placeholder='Tipo de Máquina'
+                        onChangeText={(TipoMaquina) => this.setState({ TipoMaquina })}
+                        value={this.state.TipoMaquina}
+                    ></TextInput>
 
-                        <Text style={styles.text}>Tipo de Máquina</Text>
-                        <TextInput
-                            style={[styles.inputs, styles.alinear]}
-                            placeholder='Tipo de Máquina'
-                            onChangeText={(EstadoEquipo) => this.setState({ EstadoEquipo })}
-                            value={this.state.EstadoEquipo}
-                        ></TextInput>
+                    <Text style={styles.text}>Marca</Text>
+                    <TextInput
+                        style={[styles.inputs, styles.alinear]}
+                        placeholder='Marca'
+                        onChangeText={(Marca) => this.setState({ Marca })}
+                        value={this.state.Marca}
+                    ></TextInput>
 
-                        <Text style={styles.text}>Marca</Text>
-                        <TextInput
-                            style={[styles.inputs, styles.alinear]}
-                            placeholder='Marca'
-                            onChangeText={(PartesReparar) => this.setState({ PartesReparar })}
-                            value={this.state.PartesReparar}
-                        ></TextInput>
+                    <Text style={styles.text}>Referencia</Text>
+                    <TextInput
+                        style={[styles.inputs, styles.alinear]}
+                        placeholder='Referencia'
+                        onChangeText={(Referencia) => this.setState({ Referencia })}
+                        value={this.state.Referencia}
+                    ></TextInput>
 
-                        <Text style={styles.text}>Referencia</Text>
-                        <TextInput
-                            style={[styles.inputs, styles.alinear]}
-                            placeholder='Referencia'
-                            onChangeText={(ManoObra) => this.setState({ ManoObra })}
-                            value={this.state.ManoObra}
-                        ></TextInput>
+                    <Text style={styles.text}>Modelo</Text>
+                    <TextInput
+                        style={[styles.inputs, styles.alinear]}
+                        placeholder='Modelo'
+                        onChangeText={(Modelo) => this.setState({ Modelo })}
+                        value={this.state.Modelo}
+                    ></TextInput>
 
-                        <Text style={styles.text}>Modelo</Text>
-                        <TextInput
-                            style={[styles.inputs, styles.alinear]}
-                            placeholder='Modelo'
-                            onChangeText={(RepuestosPartes) => this.setState({ RepuestosPartes })}
-                            value={this.state.RepuestosPartes}
-                        ></TextInput>
+                    <Text style={styles.text}>Serial</Text>
+                    <TextInput
+                        style={[styles.inputs, styles.alinear]}
+                        placeholder='Serial'
+                        onChangeText={(Serial) => this.setState({ Serial })}
+                        value={this.state.Serial}
+                    ></TextInput>
 
-                        <Text style={styles.text}>Serial</Text>
-                        <TextInput
-                            style={[styles.inputs, styles.alinear]}
-                            placeholder='Serial'
-                            onChangeText={(Observaciones) => this.setState({ Observaciones })}
-                            value={this.state.Observaciones}
-                        ></TextInput>
+                    {/* // Boton para subir la foto de la serial */}
+                    <Text style={styles.text}>Foto Serial</Text>
+                    <TouchableOpacity onPress={this._pickImage}>
+                        <Text style={styles.button}><FontAwesome name="download" size={20}></FontAwesome >  Subir Foto</Text>
+                    </TouchableOpacity>
+                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                        {this.state.image &&
+                            <Image source={{ uri: this.state.image }} style={styles.imagenes} />}
+                        <Text style={styles.textFoto}>{this.state.image}</Text>
+                    </View>
 
-                        {/* // Boton para subir la foto de la serial */}
-                        <Text style={styles.text}>Foto Serial</Text>
-                        <TouchableOpacity onPress={this._pickImage}>
-                            <Text style={styles.button}><FontAwesome name="download" size={20}></FontAwesome >  Subir Foto</Text>
+                    <Text style={styles.text}>Técnico</Text>
+                    <TextInput
+                        style={[styles.inputs, styles.alinear]}
+                        placeholder='Técnico'
+                        onChangeText={(nombre) => this.setState({ nombre })}
+                        value={this.state.nombre}
+                    ></TextInput>
+
+
+                    <Text style={styles.text}>Firma Cliente</Text>
+
+                    {/* //////////////////Aqui va la firma cliente */}
+                    <TouchableOpacity onPress={this.handleSignature}>
+                        <Text style={styles.button}><FontAwesome name="pencil" size={20}></FontAwesome >  Tomar Firma</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.cargarFirma}>
+                        <Text style={styles.button}><FontAwesome name="download" size={20}></FontAwesome >  Cargar Firma</Text>
+                    </TouchableOpacity>
+                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+
+                        {this.state.FirmaEncargado &&
+                            <Image
+                                source={{ uri: this.state.FirmaEncargado }}
+                                style={styles.imagenes} />
+                        }
+                    </View>
+
+                    <Text style={styles.text}>Entregado</Text>
+                    <View style={styles.checks}>
+                        <CheckBox
+                            value={this.state.checkedCostoM}
+                            onValueChange={() => this.setState({ checkedCostoM: !this.state.checkedCostoM })}
+                        >
+                        </CheckBox>
+                    </View>
+
+                    <Text style={styles.text}>No Requirió Instalación</Text>
+                    <View style={styles.checks}>
+                        <CheckBox
+                            value={this.state.checkedCostoPr}
+                            onValueChange={() => this.setState({ checkedCostoPr: !this.state.checkedCostoPr })}
+                        >
+                        </CheckBox>
+                    </View>
+
+                    <View>
+                        <TouchableOpacity onPress={() => {
+                            this.cargarDatos()
+                        }}>
+                            <Text style={styles.button}> Guardar</Text>
                         </TouchableOpacity>
-                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                            {image &&
-                                <Image source={{ uri: image }} style={styles.imagenes} />}
-                            <Text style={styles.textFoto}>{image}</Text>
-                        </View>
 
-                        <Text style={styles.text}>Técnico</Text>
-                        <TextInput
-                            style={[styles.inputs, styles.alinear]}
-                            placeholder='Técnico'
-                            onChangeText={(Observaciones) => this.setState({ Observaciones })}
-                            value={this.state.Observaciones}
-                        ></TextInput>
+                        <TouchableOpacity onPress={() => {
+                            this.props.navegar.navigate('Details')
+                        }}>
+                            <Text style={styles.button}>Cancelar</Text>
+                        </TouchableOpacity>
+                    </View>
 
-
-                        <Text style={styles.text}>Firma Cliente</Text>
-                        {/* //////////////////Aqui va la firma cliente */}
-
-                        <Text style={styles.text}>Entregado</Text>
-                        <View style={styles.checks}>
-                            <CheckBox
-                                value={this.state.checkedCostoM}
-                                onValueChange={() => this.setState({ checkedCostoM: !this.state.checkedCostoM })}
-                            >
-                            </CheckBox>
-                        </View>
-
-                        <Text style={styles.text}>No Requirió Instalación</Text>
-                        <View style={styles.checks}>
-                            <CheckBox
-                                value={this.state.checkedCostoPr}
-                                onValueChange={() => this.setState({ checkedCostoPr: !this.state.checkedCostoPr })}
-
-                            >
-                            </CheckBox>
-                        </View>
-
-                        <View>
-                            <TouchableOpacity onPress={() => {
-                                this.setModalVisible(!this.state.modalVisible)
-                            }}>
-                                <Text style={styles.button}> Guardar</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity onPress={() => {
-                                this.props.navegar.navigate('Details')
-                            }}>
-                                <Text style={styles.button}>Cancelar</Text>
-                            </TouchableOpacity>
-                        </View>
-
-                    </ScrollView>
-                </Modal>
+                </ScrollView>
             </View>
 
         );
@@ -240,6 +261,7 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     imagenes: {
+        backgroundColor: 'white',
         borderColor: 'black',
         borderWidth: 1,
         borderRadius: 25,
