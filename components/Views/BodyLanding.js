@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
-import { Modal, StyleSheet, View, ScrollView, TouchableOpacity, Alert, Text, Button } from 'react-native';
-import { Table, TableWrapper, Row } from 'react-native-table-component';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import FormatoServicio from '../../modals/FormatoServicio';
-
+import { ActivityIndicator, StyleSheet, View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import { Table, Row } from 'react-native-table-component';
+import {MaterialCommunityIcons } from '@expo/vector-icons';
 
 class BodyLanding extends Component {
     constructor(props) {
         super(props);
         this.state = {
             tableHead: ['N° Solicitud', 'Cliente', 'Sede', 'Dirección', 'Persona de Contacto','Número','Fecha','Serial','Marca', 'Referencia','Tipo de Solicitud','Gestionar'],
-            widthArr: [200, 200, 200, 200,200, 200, 200, 200,200, 200, 200, 200]
+            widthArr: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200]
         }
     }
 
@@ -25,10 +23,9 @@ class BodyLanding extends Component {
     render() {
         const state = this.state;
         const tableData = [];
-        for (let i = 0; i < 10; i += 1) {
+        for (let i = 0; i < 20; i += 1) {
             const rowData = [];
             for (let j = 0; j < 15; j += 1) {
-                //rowData.push(`${i}${j}`);
                 rowData.push(j === 11 ?
                     <TouchableOpacity onPress={() => this.solicitudGestiones(i)}>
                         <View style={styles.btn}>
@@ -42,6 +39,7 @@ class BodyLanding extends Component {
 
         return (
             <ScrollView>
+                {/* <ActivityIndicator size="large" color="#e20613" /> */}
                 <View style={styles.container}>
                     <Text style={styles.textTitulo}>Solicitudes Asignadas</Text>
                     <ScrollView horizontal={true}>
@@ -71,12 +69,12 @@ class BodyLanding extends Component {
                         </View>
                     </ScrollView>
                 </View>
-
             </ScrollView>
         )
     }
 }
 
+//Estilos de diseño para el front-end movil
 const styles = StyleSheet.create({
     container: {
         flex: 1,

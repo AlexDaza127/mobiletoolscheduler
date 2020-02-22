@@ -1,37 +1,46 @@
 import React, { Component } from 'react';
-import {Text, View, Alert, StyleSheet,
-    TouchableOpacity, TextInput, ScrollView, CheckBox, Image
+import {
+    Text, View, Alert, StyleSheet,
+    TouchableOpacity, TextInput, ScrollView, Image
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
 import { FontAwesome } from '@expo/vector-icons';
+import CheckBox from 'react-native-check-box';
 
 class FormatoEntrega extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            idMaquinaSede: '',
+            TipoMaquina: '',
+            Marca: '',
+            Referencia: '',
+            Serial: '',
+            FotoSerial: null,
+            FirmaEncargado: null,
+            image: null,
+            checkedCostoM: false,
+            checkedCostoMAct: 0,
+            checkedCostoPr: false,
+            checkedCostoPrAct: 0,
+            optimo: false,
+            optimoAct: 0,
+            critico: false,
+            criticoAct: 0,
+            precaucion: false,
+            precaucionAct: 0
+        };
+    }
 
-    state = {
-        idMaquinaSede: '',
-        TipoMaquina: '',
-        Marca: '',
-        Referencia: '',
-        Serial: '',
-        FotoSerial: null,
-        FirmaEncargado: null,
-        Status: '',//pendiente del checkbox
-        NoInst: false, //pendiente del checkbox
-        loading: false,
-        checkedCostoM: false,
-        checkedCostoPr: false,
-        image: null
-    };
-
-
-    //metodo que permite capturar la firma 
+    //método que permite capturar la firma 
     handleSignature = () => {
         this.props.navegar.navigate('firmaC');
 
     };
 
+    //método que permite actualizar el state para la firma y que a su vez se muestre en el front-end del celular
     cargarFirma = () => {
         const { firma } = this.props.rutas;
         this.setState({
@@ -39,6 +48,7 @@ class FormatoEntrega extends Component {
         }, () => { });
     }
 
+     //Validación de campos 
     cargarDatos() {
         if (this.state.TipoMaquina !== '' &&
             this.state.Marca !== '' &&
@@ -53,10 +63,12 @@ class FormatoEntrega extends Component {
 
     }
 
+    //método que permite actualizar los permisos del movil para la exploración de imágenes desde la app
     componentDidMount() {
         this.getPermissionAsync();
     }
 
+    //método que genera la petición del permiso para la exploración de imágenes desde la app
     getPermissionAsync = async () => {
         if (Constants.platform.ios) {
             const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
@@ -66,6 +78,7 @@ class FormatoEntrega extends Component {
         }
     }
 
+    //método que permite actualizar el state para la foto de la serial y que a su vez se muestre en el front-end del movil
     _pickImage = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -163,11 +176,59 @@ class FormatoEntrega extends Component {
                         }
                     </View>
 
+                    {/* checkbox para el semaforo de las solicitudes */}
+                    <Text style={styles.text}>Semáforo</Text>
+                    <View style={styles.checksSemaforos}>
+                        <CheckBox
+                            value={this.state.optimo}
+                            onClick={() => 
+                                this.setState({ 
+                                    optimo: !this.state.optimo, 
+                                    optimoAct: this.state.optimo ? 0:1})}
+                            isChecked={this.state.optimo}
+                            checkBoxColor={"green"}
+                        >
+                        </CheckBox>
+                        <Text style={{color:'green'}}> Optimo</Text>
+                    </View>
+                    <View style={styles.checksSemaforos}>
+                        <CheckBox
+                            value={this.state.precaucion}
+                            onClick={() => 
+                                this.setState({ 
+                                    precaucion: !this.state.precaucion, 
+                                    precaucionAct: this.state.precaucion ? 0:1})}
+                            isChecked={this.state.precaucion}
+                            checkBoxColor={"orange"}
+                        >
+                        </CheckBox>
+                        <Text style={{color:'orange'}}> Precaución</Text>
+                    </View>
+                    <View style={styles.checksSemaforos}>
+                        <CheckBox
+                            value={this.state.critico}
+                            onClick={() => 
+                                this.setState({ 
+                                    critico: !this.state.critico, 
+                                    criticoAct: this.state.critico ? 0:1 })}
+                            isChecked={this.state.critico}
+                            checkBoxColor={"red"}
+                        >
+                        </CheckBox>
+                        <Text style={{color:'red'}}> Critico</Text>
+                    </View>
+
+
                     <Text style={styles.text}>Entregado</Text>
                     <View style={styles.checks}>
                         <CheckBox
                             value={this.state.checkedCostoM}
-                            onValueChange={() => this.setState({ checkedCostoM: !this.state.checkedCostoM })}
+                            onClick={() => 
+                                this.setState({ 
+                                    checkedCostoM: !this.state.checkedCostoM, 
+                                    checkedCostoMAct: this.state.checkedCostoM ? 0:1  })}
+                            isChecked={this.state.checkedCostoM}
+                            checkBoxColor={"black"}
                         >
                         </CheckBox>
                     </View>
@@ -176,7 +237,12 @@ class FormatoEntrega extends Component {
                     <View style={styles.checks}>
                         <CheckBox
                             value={this.state.checkedCostoPr}
-                            onValueChange={() => this.setState({ checkedCostoPr: !this.state.checkedCostoPr })}
+                            onClick={() => 
+                                this.setState({ 
+                                    checkedCostoPr: !this.state.checkedCostoPr, 
+                                    checkedCostoPrAct: this.state.checkedCostoPr ? 0:1  })}
+                            isChecked={this.state.checkedCostoPr}
+                            checkBoxColor={"black"}
                         >
                         </CheckBox>
                     </View>
@@ -202,6 +268,7 @@ class FormatoEntrega extends Component {
     }
 }
 
+//Estilos de diseño para el front-end movil
 const styles = StyleSheet.create({
     backgroundContainer: {
         flex: 1,
@@ -258,7 +325,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+    },
+    checksSemaforos: {
+        marginBottom: 20,
+        fontSize: 90,
+        flexDirection: 'row',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     imagenes: {
         backgroundColor: 'white',

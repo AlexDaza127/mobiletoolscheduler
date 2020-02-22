@@ -2,8 +2,7 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import { View, Text, Button } from 'react-native';
+import {Ionicons} from '@expo/vector-icons';
 
 //componentes
 import BodyLogin from '../components/Login/BodyLogin'
@@ -13,15 +12,13 @@ import FormatoEntrega from '../modals/FormatoEntrega';
 import SignatureCliente from '../functions/SignatureCliente';
 import SignatureClienteServ from '../functions/SignatureClienteServicio';
 
-
-
 function Login({ navigation }) {
     return (
         <BodyLogin navegar={navigation}></BodyLogin>
     );
 }
 
-function formatoServicio({ route,navigation }) {
+function formatoServicio({ route, navigation }) {
     const { firma } = route.params;
     return (
        
@@ -89,10 +86,7 @@ function Routes() {
             <Stack.Navigator initialRouteName="Logear" headerMode="none">
                 <Stack.Screen
                     name="Logear"
-                    component={Login}
-                    options={{
-                        title: 'Login',
-                    }} />
+                    component={Login}/>
                 <Stack.Screen
                     name="Details"
                     component={gestorLandings} />

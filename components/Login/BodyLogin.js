@@ -24,26 +24,27 @@ class BodyLogin extends Component {
         this.handlePress = this.handlePress.bind(this);
     }
 
+    //método que permite verificar las credenciales del usuario en la base de datos
     handlePress = async () => {
         try {
             if (this.state.user !== '' && this.state.pass !== '') {
-                
-                const conversion = this.state.user + ":"+ this.state.pass;
+
+                const conversion = this.state.user + ":" + this.state.pass;
                 const credenciales = await base64.encode(conversion);
-                
+
                 this.setState({
                     user: '',
                     pass: ''
                 })
-            
+
                 const datos = await apiBasic('POST', 'auth-login/token', credenciales);
-                
-                 if (datos.accessToken) {
+
+                if (datos.accessToken) {
                     alert('Datos Validos... Bienvenido!')
                     this.props.navegar.navigate('Details')
-                 } else {
+                } else {
                     alert(datos.error);
-                 }                
+                }
             } else {
                 alert('digite todos los datos')
             }
@@ -56,7 +57,7 @@ class BodyLogin extends Component {
         return (
             <ImageBackground source={bgImage} style={styles.backgroundContainer}>
                 <View style={styles.container}>
-                    <Image source={Logo}/>
+                    <Image source={Logo} />
                     <Text
                         style={[styles.alinear, styles.fontLetter]}>
                         Ingresar
@@ -85,6 +86,7 @@ class BodyLogin extends Component {
     }
 }
 
+//Estilos de diseño para el front-end movil
 const styles = StyleSheet.create({
     fontLetter: {
         fontWeight: 'bold',

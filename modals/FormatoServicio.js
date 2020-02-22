@@ -1,37 +1,46 @@
 import React, { Component, Fragment } from 'react';
-import {Text, View, Alert, StyleSheet,
-    TouchableOpacity, TextInput, ScrollView, CheckBox, Image
+import {
+    Text, View, Alert, StyleSheet,
+    TouchableOpacity, TextInput, ScrollView, Image
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-
-
+import CheckBox from 'react-native-check-box';
+import { api } from '../functions/api';
 
 class FormatoServicio extends Component {
-    state = {
-        modalVisible: true,
-        EstadoEquipo: '',
-        PartesReparar: '',
-        ManoObra: '',
-        RepuestosPartes: '',
-        AplicaCostoM: '',
-        AplicaCostoPr: '',
-        CostoM: '',
-        CostoPr: '',
-        CostoConcepM: '',
-        CostoConcepPr: '',
-        Observaciones: '',
-        FirmaEncargado: null,
-        loading: false,
-        checkedCostoM: false,
-        checkedCostoPr: false
-    };
+    constructor(props) {
+        super(props);
+        this.state = {
+            EstadoEquipo: '',
+            PartesReparar: '',
+            ManoObra: '',
+            RepuestosPartes: '',
+            AplicaCostoM: '',
+            AplicaCostoPr: '',
+            CostoM: '',
+            CostoPr: '',
+            Observaciones: '',
+            FirmaEncargado: null,
+            checkedCostoM: false,
+            checkedCostoMAct: 0,
+            checkedCostoPr: false,
+            checkedCostoPrAct: 0,
+            optimo: false,
+            optimoAct: 0,
+            critico: false,
+            criticoAct: 0,
+            precaucion: false,
+            precaucionAct: 0
+        };
+    }
+
 
     //método que permite capturar la firma 
     handleSignature = () => {
         this.props.navegar.navigate('firmaCS');
 
     };
-
+    //método que permite actualizar el state para la firma y que a su vez se muestre en el front-end del movil
     cargarFirma = () => {
         const { firma } = this.props.rutas;
         this.setState({
@@ -39,24 +48,55 @@ class FormatoServicio extends Component {
         }, () => { });
     }
 
+    //Validación de campos 
     guardarDatos() {
-        
-        if(this.state.EstadoEquipo !== '' &&
-        this.state.PartesReparar !== '' &&
-        this.state.ManoObra !== '' &&
-        this.state.RepuestosPartes !== '' &&
-        this.state.Observaciones !== '' &&
-        this.state.FirmaEncargado !== null){
+
+        if (this.state.EstadoEquipo !== '' &&
+            this.state.PartesReparar !== '' &&
+            this.state.ManoObra !== '' &&
+            this.state.RepuestosPartes !== '' &&
+            this.state.Observaciones !== '' &&
+            this.state.FirmaEncargado !== null) {
             Alert.alert(`Se guardaron los datos correctamente`);
             this.props.navegar.navigate('Details')
-        }else{
+        } else {
             Alert.alert(`Faltan campos por validar!`);
-            
+
         }
-        
+
     }
 
-    
+    //Evento que actualiza el ID del formulario en caso de actualización
+    componentDidUpdate(prevProps) {
+        if (this.props.idSolicitudesDet !== prevProps.idSolicitudesDet) {
+            this.traerDatosDetallesServicio(this.props.idSolicitudesDet);
+        }
+    }
+
+    //Función que llama detalle de solicitud en caso de existir ID
+    async traerDatosDetallesServicio(idSolicitudesDet) {
+        try {
+
+            //Se realiza petición
+            const datos = await api('GET', `solicitudesdet/solicitudes-detalle/servicio/${idSolicitudesDet}`);
+            console.log(datos)
+            //Se la petición fue exitosa
+            if (datos.estado) {
+                //Se actualizan los datos en el estado para poderse mostrar en el formulario
+                const solicitudesDet = datos.data[0];
+                this.setState({
+                    ...solicitudesDet
+                });
+            }
+            else {
+                alert('No fue posible traer datos de del detallado de la solicitud');
+            }
+        }
+        catch (error) {
+            alert('Error en servidor');
+        }
+    }
+
     render() {
         console.log(this.state)
         return (
@@ -103,12 +143,64 @@ class FormatoServicio extends Component {
                         value={this.state.Observaciones}
                     ></TextInput>
 
+                    {/* checkbox para el semaforo de las solicitudes */}
+                    <Text style={styles.text}>Semáforo</Text>
+                    <View style={styles.checksSemaforos}>
+                        <CheckBox
+                            value={this.state.optimo}
+                            onClick={() =>
+                                this.setState({
+                                    optimo: !this.state.optimo,
+                                    optimoAct: this.state.optimo ? 0 : 1
+                                })}
+                            isChecked={this.state.optimo}
+                            checkBoxColor={"green"}
+                        >
+                        </CheckBox>
+                        <Text style={{ color: 'green' }}> Optimo</Text>
+                    </View>
+                    <View style={styles.checksSemaforos}>
+                        <CheckBox
+                            value={this.state.precaucion}
+                            onClick={() =>
+                                this.setState({
+                                    precaucion: !this.state.precaucion,
+                                    precaucionAct: this.state.precaucion ? 0 : 1
+                                })}
+                            isChecked={this.state.precaucion}
+                            checkBoxColor={"orange"}
+                        >
+                        </CheckBox>
+                        <Text style={{ color: 'orange' }}> Precaución</Text>
+                    </View>
+                    <View style={styles.checksSemaforos}>
+                        <CheckBox
+                            value={this.state.critico}
+                            onClick={() =>
+                                this.setState({
+                                    critico: !this.state.critico,
+                                    criticoAct: this.state.critico ? 0 : 1
+                                })}
+                            isChecked={this.state.critico}
+                            checkBoxColor={"red"}
+                        >
+                        </CheckBox>
+                        <Text style={{ color: 'red' }}> Critico</Text>
+                    </View>
+
                     {/* //////////////////////////////// */}
                     <Text style={styles.text}>Costos de Mantenimiento</Text>
                     <View style={styles.checks}>
                         <CheckBox
                             value={this.state.checkedCostoM}
-                            onValueChange={() => this.setState({ checkedCostoM: !this.state.checkedCostoM, AplicaCostoM: 1 })}
+                            onClick={() =>
+                                this.setState({
+                                    checkedCostoM: !this.state.checkedCostoM,
+                                    checkedCostoMAct: this.state.checkedCostoM ? 0 : 1
+                                })}
+                            isChecked={this.state.checkedCostoM}
+                            isChecked={this.state.checkedCostoM}
+                            checkBoxColor={"black"}
                         >
                         </CheckBox>
                         <Text>¿Aplica costo?</Text>
@@ -138,11 +230,17 @@ class FormatoServicio extends Component {
                     <View style={styles.checks}>
                         <CheckBox
                             value={this.state.checkedCostoPr}
-                            onValueChange={() => this.setState({ checkedCostoPr: !this.state.checkedCostoPr, AplicaCostoPr: 1 })}
+                            onClick={() =>
+                                this.setState({
+                                    checkedCostoPr: !this.state.checkedCostoPr,
+                                    checkedCostoPrAct: this.state.checkedCostoPr ? 0 : 1
+                                })}
+                            isChecked={this.state.checkedCostoPr}
+                            isChecked={this.state.checkedCostoPr}
+                            checkBoxColor={"black"}
                         >
                         </CheckBox>
                         <Text>¿Aplica costo?</Text>
-
                     </View>
 
                     {this.state.checkedCostoPr ? (
@@ -203,6 +301,7 @@ class FormatoServicio extends Component {
     }
 }
 
+//Estilos de diseño para el front-end movil
 const styles = StyleSheet.create({
     backgroundContainer: {
         flex: 1,
@@ -250,6 +349,14 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
+    },
+    checksSemaforos: {
+        marginBottom: 20,
+        fontSize: 90,
+        flexDirection: 'row',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     imagenes: {
         backgroundColor: 'white',
