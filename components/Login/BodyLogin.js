@@ -1,7 +1,7 @@
-import React, { Component, cloneElement } from 'react';
+import React, { Component } from 'react';
 
 //dependencias
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground, Image } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground, Image, AsyncStorage } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import base64 from 'react-native-base64'
 
@@ -11,14 +11,15 @@ import Logo from '../../images/logo-gn-representaciones.png'
 
 //funciones
 import { apiBasic } from '../../functions/api';
-
+import Loader from '../../functions/Loader';
 
 class BodyLogin extends Component {
     constructor(props) {
         super(props);
         this.state = {
             user: '',
-            pass: ''
+            pass: '',
+            loading: false
         };
 
         this.handlePress = this.handlePress.bind(this);
@@ -37,16 +38,20 @@ class BodyLogin extends Component {
                     pass: ''
                 })
 
+                this.setState({ loading: true });
+
                 const datos = await apiBasic('POST', 'auth-login/token', credenciales);
 
+
                 if (datos.accessToken) {
-                    alert('Datos Validos... Bienvenido!')
-                    this.props.navegar.navigate('Details')
+                    await AsyncStorage.setItem('token', datos.accessToken);
+                    this.props.navegar.navigate('Details');
                 } else {
                     alert(datos.error);
                 }
+                this.setState({ loading: false });
             } else {
-                alert('digite todos los datos')
+                alert('Digite todos los datos')
             }
         } catch (error) {
 
@@ -54,6 +59,9 @@ class BodyLogin extends Component {
     }
 
     render() {
+        if (this.state.loading) {
+            return <Loader />;
+        }
         return (
             <ImageBackground source={bgImage} style={styles.backgroundContainer}>
                 <View style={styles.container}>

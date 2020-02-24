@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Routes from '../ToolsScheduler-Mobile/routes/Routes'
+import Routes from '../mobiletoolscheduler/routes/Routes'
 
 function App() {
   return (

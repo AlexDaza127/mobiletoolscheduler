@@ -1,64 +1,97 @@
 import React, { Component } from 'react';
-import { ActivityIndicator, StyleSheet, View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, ScrollView, TouchableOpacity, Text } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
-import {MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { api } from '../../functions/api';
+import Loader from '../../functions/Loader';
 
 class BodyLanding extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            tableHead: ['N° Solicitud', 'Cliente', 'Sede', 'Dirección', 'Persona de Contacto','Número','Fecha','Serial','Marca', 'Referencia','Tipo de Solicitud','Gestionar'],
-            widthArr: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200]
+            tableHead: ['N° Solicitud', 'Tipo de Solicitud', 'Cliente', 'Sede', 'Dirección', 'Persona de Contacto', 'Teléfono', 'Fecha', 'Serial', 'Tipo máquina', 'Marca', 'Referencia', 'Gestionar'],
+            widthArr: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+            data: [],
+            loading: false
         }
     }
 
-    solicitudGestiones(i) {
-        if (i === 2) {
-            this.props.navegar.navigate('formatoS');
-        } else {
+    solicitudGestiones(id, tipo) {
+        if (tipo === 1) {
             this.props.navegar.navigate('formatoE');
+        } else {
+            this.props.navegar.navigate('formatoS');
         }
+    }
+
+    componentDidMount() {
+        this.traerSolicitudesPendientes();
+    }
+
+    async traerSolicitudesPendientes() {
+        try {
+            this.setState({ loading: true });
+            const datos = await api('GET', 'solicitudes-movil/lista-servicios');
+            if (datos.estado) {
+                const tablaSolicitudes = this.llenarTabla(datos.data);
+                this.setState({ data: tablaSolicitudes });
+            }
+            this.setState({ loading: false });
+        } catch (error) {
+        }
+    }
+
+    llenarTabla(datos) {
+        const arraySolicitudes = datos.map((solicitud) => {
+            const arregloSolicitud = [
+                solicitud.id,
+                solicitud.TipoSolicitud,
+                solicitud.cliente,
+                solicitud.sede,
+                solicitud.Direccion,
+                solicitud.ContactoSede,
+                solicitud.TelefonoSede,
+                solicitud.fecha,
+                solicitud.Serial,
+                solicitud.TipoMaquina,
+                solicitud.Marca,
+                solicitud.Referencia,
+                <TouchableOpacity onPress={() => this.solicitudGestiones(solicitud.idSolicitudesDet, solicitud.TipoServicio)}>
+                    <View style={styles.btn}>
+                        <Text style={styles.text}><MaterialCommunityIcons name="teach" size={28}></MaterialCommunityIcons ></Text>
+                    </View>
+                </TouchableOpacity>
+            ]
+            return arregloSolicitud;
+        });
+        return arraySolicitudes;
     }
 
     render() {
-        const state = this.state;
-        const tableData = [];
-        for (let i = 0; i < 20; i += 1) {
-            const rowData = [];
-            for (let j = 0; j < 15; j += 1) {
-                rowData.push(j === 11 ?
-                    <TouchableOpacity onPress={() => this.solicitudGestiones(i)}>
-                        <View style={styles.btn}>
-                            <Text style={styles.text}><MaterialCommunityIcons name="teach" size={28}></MaterialCommunityIcons >{i}</Text>
-                        </View>
-                    </TouchableOpacity> : `${i}${j}`
-                );
-            }
-            tableData.push(rowData);
+        if (this.state.loading) {
+            return <Loader />;
         }
-
         return (
             <ScrollView>
-                {/* <ActivityIndicator size="large" color="#e20613" /> */}
                 <View style={styles.container}>
                     <Text style={styles.textTitulo}>Solicitudes Asignadas</Text>
                     <ScrollView horizontal={true}>
                         <View style={styles.tables}>
                             <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
                                 <Row
-                                    data={state.tableHead}
-                                    widthArr={state.widthArr}
+                                    data={this.state.tableHead}
+                                    widthArr={this.state.widthArr}
                                     style={styles.header}
                                     textStyle={styles.textHeader} />
                             </Table>
                             <ScrollView style={styles.dataWrapper}>
                                 <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
                                     {
-                                        tableData.map((rowData, index) => (
+                                        this.state.data.map((rowData, index) => (
                                             <Row
                                                 key={index}
                                                 data={rowData}
-                                                widthArr={state.widthArr}
+                                                widthArr={this.state.widthArr}
                                                 style={[styles.row, index % 2 && { backgroundColor: '#FFF' }]}
                                                 textStyle={styles.text}
                                             />
