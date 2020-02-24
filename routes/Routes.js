@@ -2,7 +2,7 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import {Ionicons} from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 
 //componentes
 import BodyLogin from '../components/Login/BodyLogin'
@@ -20,9 +20,10 @@ function Login({ navigation }) {
 
 function formatoServicio({ route, navigation }) {
     const { firma } = route.params;
+    const { id } = route.params;
     return (
-       
-        <FormatoServicio navegar={navigation}  rutas={{ firma }}></FormatoServicio>
+
+        <FormatoServicio navegar={navigation} id={id} rutas={{ firma }}></FormatoServicio>
     );
 }
 
@@ -40,8 +41,9 @@ function firmaClienteServicio({ navigation }) {
 
 function formatoEntrega({ route, navigation }) {
     const { firma } = route.params;
+    const { id } = route.params;
     return (
-        <FormatoEntrega navegar={navigation} rutas={{ firma }}></FormatoEntrega>
+        <FormatoEntrega navegar={navigation} id={id} rutas={{ firma }}></FormatoEntrega>
     );
 }
 
@@ -86,7 +88,7 @@ function Routes() {
             <Stack.Navigator initialRouteName="Logear" headerMode="none">
                 <Stack.Screen
                     name="Logear"
-                    component={Login}/>
+                    component={Login} />
                 <Stack.Screen
                     name="Details"
                     component={gestorLandings} />

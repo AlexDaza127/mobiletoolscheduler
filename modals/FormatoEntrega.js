@@ -8,6 +8,7 @@ import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
 import { FontAwesome } from '@expo/vector-icons';
 import CheckBox from 'react-native-check-box';
+import { api } from '../functions/api';
 
 class FormatoEntrega extends Component {
     constructor(props) {
@@ -23,8 +24,8 @@ class FormatoEntrega extends Component {
             image: null,
             checkedCostoM: false,
             checkedCostoMAct: 0,
-            checkedCostoPr: false,
-            checkedCostoPrAct: 0,
+            NoInst: false,
+            NoInstAct: 0,
             optimo: false,
             optimoAct: 0,
             critico: false,
@@ -37,7 +38,6 @@ class FormatoEntrega extends Component {
     //método que permite capturar la firma 
     handleSignature = () => {
         this.props.navegar.navigate('firmaC');
-
     };
 
     //método que permite actualizar el state para la firma y que a su vez se muestre en el front-end del celular
@@ -48,17 +48,28 @@ class FormatoEntrega extends Component {
         }, () => { });
     }
 
-     //Validación de campos 
-    cargarDatos() {
+    //Validación de campos 
+    async cargarDatos() {
         if (this.state.TipoMaquina !== '' &&
             this.state.Marca !== '' &&
             this.state.Referencia !== '' &&
             this.state.FirmaEncargado !== null &&
-            this.state.Serial !== '') {
+            this.state.Serial !== ''
+        ) {
+            const formulario = new FormData();
+
+            for (const key in this.state) {
+                if (key !== 'FirmaEncargado') {
+                    formulario.append(key, this.state[key]);
+                }
+            }
+            console.log(formulario);
+            const datos = await api('PUT', `solicitudes-movil/actualizar-servicio/instalacion`, formulario, true);
+
             Alert.alert(`Se guardaron los datos correctamente`);
-            this.props.navegar.navigate('Details')
+            //this.props.navegar.navigate('Details')
         } else {
-            Alert.alert(`Faltan campos por validar!`);
+            Alert.alert(`¡Faltan campos por validar!`);
         }
 
     }
@@ -66,6 +77,7 @@ class FormatoEntrega extends Component {
     //método que permite actualizar los permisos del movil para la exploración de imágenes desde la app
     componentDidMount() {
         this.getPermissionAsync();
+        this.traerDatosSolicitudEntrega();
     }
 
     //método que genera la petición del permiso para la exploración de imágenes desde la app
@@ -73,7 +85,7 @@ class FormatoEntrega extends Component {
         if (Constants.platform.ios) {
             const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
             if (status !== 'granted') {
-                alert('Perdón, necesita dar permiso a la aplicación para acceder a la galería de fotos!');
+                alert('Necesita dar permiso a la aplicación para acceder a la galería de fotos');
             }
         }
     }
@@ -85,50 +97,49 @@ class FormatoEntrega extends Component {
             allowsEditing: true,
             quality: 1
         });
-
         if (!result.cancelled) {
             this.setState({ image: result.uri });
+            this.setState({ FotoSerial: { uri: result.uri, name:'FotoSerial.jpg', type:'image/jpeg' } });
         }
     };
 
+    async traerDatosSolicitudEntrega() {
+        try {
+            this.setState({ loading: true });
+            const datos = await api('GET', `solicitudes-movil/solicitudes-detalle/asignacion/${this.props.id}`);
+            if (datos.estado) {
+                this.setState({ ...datos.data[0] });
+            }
+            this.setState({ loading: false });
+        } catch (error) {
+        }
+    }
+
     render() {
-        console.log(this.state)
         return (
             <View>
                 <ScrollView>
                     <Text style={styles.title}>Formato de Entrega</Text>
 
                     <Text style={styles.text}>Tipo de Máquina</Text>
-                    <TextInput
+                    <Text
                         style={[styles.inputs, styles.alinear]}
-                        placeholder='Tipo de Máquina'
-                        onChangeText={(TipoMaquina) => this.setState({ TipoMaquina })}
-                        value={this.state.TipoMaquina}
-                    ></TextInput>
+                    >{this.state.TipoMaquina}</Text>
 
                     <Text style={styles.text}>Marca</Text>
-                    <TextInput
+                    <Text
                         style={[styles.inputs, styles.alinear]}
-                        placeholder='Marca'
-                        onChangeText={(Marca) => this.setState({ Marca })}
-                        value={this.state.Marca}
-                    ></TextInput>
+                    >{this.state.Marca}</Text>
 
                     <Text style={styles.text}>Referencia</Text>
-                    <TextInput
+                    <Text
                         style={[styles.inputs, styles.alinear]}
-                        placeholder='Referencia'
-                        onChangeText={(Referencia) => this.setState({ Referencia })}
-                        value={this.state.Referencia}
-                    ></TextInput>
+                    >{this.state.Referencia}</Text>
 
                     <Text style={styles.text}>Modelo</Text>
-                    <TextInput
+                    <Text
                         style={[styles.inputs, styles.alinear]}
-                        placeholder='Modelo'
-                        onChangeText={(Modelo) => this.setState({ Modelo })}
-                        value={this.state.Modelo}
-                    ></TextInput>
+                    >{this.state.Modelo}</Text>
 
                     <Text style={styles.text}>Serial</Text>
                     <TextInput
@@ -138,29 +149,19 @@ class FormatoEntrega extends Component {
                         value={this.state.Serial}
                     ></TextInput>
 
-                    {/* // Boton para subir la foto de la serial */}
+                    {/* Boton para subir la foto de la serial */}
                     <Text style={styles.text}>Foto Serial</Text>
                     <TouchableOpacity onPress={this._pickImage}>
-                        <Text style={styles.button}><FontAwesome name="download" size={20}></FontAwesome >  Subir Foto</Text>
+                        <Text style={styles.button}><FontAwesome name="upload" size={20}></FontAwesome > Subir Foto</Text>
                     </TouchableOpacity>
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                         {this.state.image &&
                             <Image source={{ uri: this.state.image }} style={styles.imagenes} />}
-                        <Text style={styles.textFoto}>{this.state.image}</Text>
                     </View>
 
-                    <Text style={styles.text}>Técnico</Text>
-                    <TextInput
-                        style={[styles.inputs, styles.alinear]}
-                        placeholder='Técnico'
-                        onChangeText={(nombre) => this.setState({ nombre })}
-                        value={this.state.nombre}
-                    ></TextInput>
 
-
+                    {/* Aqui va la firma cliente */}
                     <Text style={styles.text}>Firma Cliente</Text>
-
-                    {/* //////////////////Aqui va la firma cliente */}
                     <TouchableOpacity onPress={this.handleSignature}>
                         <Text style={styles.button}><FontAwesome name="pencil" size={20}></FontAwesome >  Tomar Firma</Text>
                     </TouchableOpacity>
@@ -176,58 +177,69 @@ class FormatoEntrega extends Component {
                         }
                     </View>
 
-                    {/* checkbox para el semaforo de las solicitudes */}
-                    <Text style={styles.text}>Semáforo</Text>
+                    <Text style={styles.text}>Observaciones</Text>
+                    <TextInput
+                        style={[styles.inputs, styles.alinear]}
+                        placeholder="Observaciones"
+                        onChangeText={(Observaciones) => this.setState({ Observaciones })}
+                        value={this.state.Observaciones}
+                    ></TextInput>
+                    {/* Checkbox para el estado de las observaciones */}
+                    <Text style={styles.text}>Estado de las observaciones</Text>
                     <View style={styles.checksSemaforos}>
                         <CheckBox
                             value={this.state.optimo}
-                            onClick={() => 
-                                this.setState({ 
-                                    optimo: !this.state.optimo, 
-                                    optimoAct: this.state.optimo ? 0:1})}
+                            onClick={() =>
+                                this.setState({
+                                    optimo: !this.state.optimo,
+                                    optimoAct: this.state.optimo ? 0 : 1
+                                })}
                             isChecked={this.state.optimo}
                             checkBoxColor={"green"}
                         >
                         </CheckBox>
-                        <Text style={{color:'green'}}> Optimo</Text>
+                        <Text style={{ color: 'green' }}> Optimo</Text>
                     </View>
                     <View style={styles.checksSemaforos}>
                         <CheckBox
                             value={this.state.precaucion}
-                            onClick={() => 
-                                this.setState({ 
-                                    precaucion: !this.state.precaucion, 
-                                    precaucionAct: this.state.precaucion ? 0:1})}
+                            onClick={() =>
+                                this.setState({
+                                    precaucion: !this.state.precaucion,
+                                    precaucionAct: this.state.precaucion ? 0 : 1
+                                })}
                             isChecked={this.state.precaucion}
                             checkBoxColor={"orange"}
                         >
                         </CheckBox>
-                        <Text style={{color:'orange'}}> Precaución</Text>
+                        <Text style={{ color: 'orange' }}> Precaución</Text>
                     </View>
                     <View style={styles.checksSemaforos}>
                         <CheckBox
                             value={this.state.critico}
-                            onClick={() => 
-                                this.setState({ 
-                                    critico: !this.state.critico, 
-                                    criticoAct: this.state.critico ? 0:1 })}
+                            onClick={() =>
+                                this.setState({
+                                    critico: !this.state.critico,
+                                    criticoAct: this.state.critico ? 0 : 1
+                                })}
                             isChecked={this.state.critico}
                             checkBoxColor={"red"}
                         >
                         </CheckBox>
-                        <Text style={{color:'red'}}> Critico</Text>
+                        <Text style={{ color: 'red' }}> Critico</Text>
                     </View>
 
 
-                    <Text style={styles.text}>Entregado</Text>
+                    <Text style={styles.text}>Instalada</Text>
                     <View style={styles.checks}>
                         <CheckBox
                             value={this.state.checkedCostoM}
-                            onClick={() => 
-                                this.setState({ 
-                                    checkedCostoM: !this.state.checkedCostoM, 
-                                    checkedCostoMAct: this.state.checkedCostoM ? 0:1  })}
-                            isChecked={this.state.checkedCostoM}
+                            onClick={() =>
+                                this.setState({
+                                    checkedCostoM: !this.state.checkedCostoM,
+                                    checkedCostoMAct: this.state.Status === 10 ? 1 : 0
+                                })}
+                            isChecked={this.state.checkedCostoM === 10}
                             checkBoxColor={"black"}
                         >
                         </CheckBox>
@@ -236,12 +248,13 @@ class FormatoEntrega extends Component {
                     <Text style={styles.text}>No Requirió Instalación</Text>
                     <View style={styles.checks}>
                         <CheckBox
-                            value={this.state.checkedCostoPr}
-                            onClick={() => 
-                                this.setState({ 
-                                    checkedCostoPr: !this.state.checkedCostoPr, 
-                                    checkedCostoPrAct: this.state.checkedCostoPr ? 0:1  })}
-                            isChecked={this.state.checkedCostoPr}
+                            value={this.state.NoInst}
+                            onClick={() =>
+                                this.setState({
+                                    NoInst: !this.state.NoInst,
+                                    NoInstAct: this.state.NoInst ? 0 : 1
+                                })}
+                            isChecked={this.state.NoInst}
                             checkBoxColor={"black"}
                         >
                         </CheckBox>
@@ -277,15 +290,18 @@ const styles = StyleSheet.create({
     },
     inputs: {
         paddingHorizontal: 20,
+        paddingVertical: 15,
         height: 50,
         borderColor: 'gray',
         borderWidth: 1,
         borderRadius: 25,
         backgroundColor: '#FFF',
         marginHorizontal: 20
-    }, alinear: {
+    },
+    alinear: {
         marginBottom: 20
-    }, button: {
+    },
+    button: {
         backgroundColor: '#e20613',
         borderColor: 'black',
         borderWidth: 1,
@@ -298,7 +314,8 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         marginHorizontal: 100,
         fontSize: 16
-    }, title: {
+    },
+    title: {
         margin: 20,
         fontSize: 20,
         fontWeight: 'bold',
@@ -307,13 +324,6 @@ const styles = StyleSheet.create({
     },
     text: {
         marginTop: 20,
-        marginHorizontal: 20,
-        marginBottom: 10,
-        fontSize: 15,
-        textAlign: 'center',
-    },
-    textFoto: {
-        marginTop: 10,
         marginHorizontal: 20,
         marginBottom: 10,
         fontSize: 15,

@@ -30,7 +30,8 @@ class FormatoServicio extends Component {
             critico: false,
             criticoAct: 0,
             precaucion: false,
-            precaucionAct: 0
+            precaucionAct: 0,
+            loading: false
         };
     }
 
@@ -68,18 +69,18 @@ class FormatoServicio extends Component {
 
     //Evento que actualiza el ID del formulario en caso de actualización
     componentDidUpdate(prevProps) {
-        if (this.props.idSolicitudesDet !== prevProps.idSolicitudesDet) {
-            this.traerDatosDetallesServicio(this.props.idSolicitudesDet);
+        if (this.props.id !== prevProps.id) {
+            this.traerDatosDetallesServicio(this.props.id);
         }
     }
 
     //Función que llama detalle de solicitud en caso de existir ID
-    async traerDatosDetallesServicio(idSolicitudesDet) {
+    async traerDatosDetallesServicio(id) {
         try {
+            this.setState({ loading: true });
 
             //Se realiza petición
-            const datos = await api('GET', `solicitudesdet/solicitudes-detalle/servicio/${idSolicitudesDet}`);
-            console.log(datos)
+            const datos = await api('GET', `solicitudes-movil/solicitudes-detalle/servicio/${id}`);
             //Se la petición fue exitosa
             if (datos.estado) {
                 //Se actualizan los datos en el estado para poderse mostrar en el formulario
@@ -91,6 +92,7 @@ class FormatoServicio extends Component {
             else {
                 alert('No fue posible traer datos de del detallado de la solicitud');
             }
+            this.setState({ loading: false });
         }
         catch (error) {
             alert('Error en servidor');
@@ -98,7 +100,9 @@ class FormatoServicio extends Component {
     }
 
     render() {
-        console.log(this.state)
+        if (this.state.loading) {
+            return <Loader />;
+        }
         return (
             <View>
                 <ScrollView>

@@ -18,9 +18,9 @@ class BodyLanding extends Component {
 
     solicitudGestiones(id, tipo) {
         if (tipo === 1) {
-            this.props.navegar.navigate('formatoE');
+            this.props.navegar.navigate('formatoE', { id });
         } else {
-            this.props.navegar.navigate('formatoS');
+            this.props.navegar.navigate('formatoS', { id });
         }
     }
 

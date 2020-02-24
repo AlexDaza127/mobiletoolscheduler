@@ -44,8 +44,15 @@ class BodyLogin extends Component {
 
 
                 if (datos.accessToken) {
-                    await AsyncStorage.setItem('token', datos.accessToken);
-                    this.props.navegar.navigate('Details');
+                    const tokenSplit = datos.accessToken.split('.');
+                    const usuario = JSON.parse(base64.decode(tokenSplit[1]));
+                    if(usuario.rol === 'tecnico'){
+                        await AsyncStorage.setItem('token', datos.accessToken);
+                        this.props.navegar.navigate('Details');
+                    }
+                    else{
+                        alert('Aplicación exclusiva para técnicos');
+                    }
                 } else {
                     alert(datos.error);
                 }
