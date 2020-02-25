@@ -50,26 +50,30 @@ class FormatoEntrega extends Component {
 
     //Validación de campos 
     async cargarDatos() {
-        if (this.state.TipoMaquina !== '' &&
-            this.state.Marca !== '' &&
-            this.state.Referencia !== '' &&
-            this.state.FirmaEncargado !== null &&
-            this.state.Serial !== ''
-        ) {
-            const formulario = new FormData();
-
-            for (const key in this.state) {
-                if (key !== 'FirmaEncargado') {
+        try {
+            if (
+                true
+            ) {
+                //Se crea formdata para subir información junto con las imágenes
+                const formulario = new FormData();
+                for (const key in this.state) {
                     formulario.append(key, this.state[key]);
                 }
-            }
-            console.log(formulario);
-            const datos = await api('PUT', `solicitudes-movil/actualizar-servicio/instalacion`, formulario, true);
 
-            Alert.alert(`Se guardaron los datos correctamente`);
-            //this.props.navegar.navigate('Details')
-        } else {
-            Alert.alert(`¡Faltan campos por validar!`);
+                //Se realiza petición
+                const datos = await api('PUT', `solicitudes-movil/actualizar-servicio/instalacion`, formulario, true);
+
+                Alert.alert(datos.mensaje);
+
+                if(datos.estado){
+                    //this.props.navegar.navigate('Details')
+                }
+            } else {
+                Alert.alert(`¡Faltan campos por validar!`);
+            }
+        }
+        catch (error) {
+
         }
 
     }
@@ -78,6 +82,13 @@ class FormatoEntrega extends Component {
     componentDidMount() {
         this.getPermissionAsync();
         this.traerDatosSolicitudEntrega();
+    }
+
+    componentDidUpdate(prevProps){
+        if(prevProps.rutas.firma !== this.props.rutas.firma){
+            this.cargarFirma();
+        }
+
     }
 
     //método que genera la petición del permiso para la exploración de imágenes desde la app
@@ -99,7 +110,10 @@ class FormatoEntrega extends Component {
         });
         if (!result.cancelled) {
             this.setState({ image: result.uri });
-            this.setState({ FotoSerial: { uri: result.uri, name:'FotoSerial.jpg', type:'image/jpeg' } });
+            //Se extrae extensión de la imagen
+            const extension = result.uri.split('.').pop();
+            //Se realiza guardado de imagen en el formato para indicar que es un archivo
+            this.setState({ FotoSerial: { uri: result.uri, name: `FotoSerial.${extension}`, type: 'image/*' } });
         }
     };
 
@@ -152,22 +166,19 @@ class FormatoEntrega extends Component {
                     {/* Boton para subir la foto de la serial */}
                     <Text style={styles.text}>Foto Serial</Text>
                     <TouchableOpacity onPress={this._pickImage}>
-                        <Text style={styles.button}><FontAwesome name="upload" size={20}></FontAwesome > Subir Foto</Text>
+                        <Text style={styles.button}><FontAwesome name="upload" size={20}></FontAwesome> Subir Foto</Text>
                     </TouchableOpacity>
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
                         {this.state.image &&
                             <Image source={{ uri: this.state.image }} style={styles.imagenes} />}
                     </View>
-
-
+                    
                     {/* Aqui va la firma cliente */}
                     <Text style={styles.text}>Firma Cliente</Text>
                     <TouchableOpacity onPress={this.handleSignature}>
-                        <Text style={styles.button}><FontAwesome name="pencil" size={20}></FontAwesome >  Tomar Firma</Text>
+                        <Text style={styles.button}><FontAwesome name="pencil" size={20}></FontAwesome>  Tomar Firma</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={this.cargarFirma}>
-                        <Text style={styles.button}><FontAwesome name="download" size={20}></FontAwesome >  Cargar Firma</Text>
-                    </TouchableOpacity>
+
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
 
                         {this.state.FirmaEncargado &&

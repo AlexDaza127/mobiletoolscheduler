@@ -1,7 +1,8 @@
 import { AsyncStorage } from 'react-native';
-async function request(method, url, body, auth) {
+
+//Función de petición general
+async function request(method, url, body, auth, upload) {
     try {
-        //console.log("por aqui pase")
         //URL de ambiente para hacer peticiones al back
         const urlApi = 'http://192.168.1.7:8000/api';
 
@@ -11,32 +12,40 @@ async function request(method, url, body, auth) {
             headers: {
                 'Authorization': auth, //Token de autorización
                 'Content-Type': 'application/json'
-            },
+            }
             //Se envían datos formateados en JSON
         };
 
         //Solo si el método no es GET se incluye body
-        if (method.toUpperCase() !== 'GET') {
+        if (method.toUpperCase() !== 'GET' && !upload) {
             requestOptions.body = JSON.stringify(body);
         }
+        else if(upload){
+            //Cuando está activada la carga de archivos se debe eliminar el Content-Type
+            requestOptions.headers['Content-Type'] = 'multipart/form-data';
+            requestOptions.body = body;
+        }
 
+        //Se realiza petición
         const response = await fetch(`${urlApi}/${url}`, requestOptions);
 
+        //Se recibe respuesta y se transforma en JSON
         const datos = await response.json();
         return datos;
     }
     catch (error) {
-        //console.log(error);
+        console.log(error);
         return {
             estado: false,
             mensaje: 'Error al realizar petición'
         }
     }
 }
+
 //Función de API para peticiones
-async function api(method, url, body = {}) {
+async function api(method, url, body = {}, upload) {
     const token = await AsyncStorage.getItem('token');
-    return await request(method, url, body, `Bearer ${token}`);
+    return await request(method, url, body, `Bearer ${token}`, upload);
 }
 
 //Función de API para login
@@ -44,4 +53,7 @@ async function apiBasic(method, url, credenciales) {
     return await request(method, url, {}, `Basic ${credenciales}`);
 }
 
-export { api, apiBasic }
+export {
+    api,
+    apiBasic
+}
