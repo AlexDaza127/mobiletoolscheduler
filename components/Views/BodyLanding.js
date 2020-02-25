@@ -9,8 +9,8 @@ class BodyLanding extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            tableHead: ['N° Solicitud', 'Tipo de Solicitud', 'Cliente', 'Sede', 'Dirección', 'Persona de Contacto', 'Teléfono', 'Fecha', 'Serial', 'Tipo máquina', 'Marca', 'Referencia', 'Gestionar'],
-            widthArr: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+            tableHead: ['N° Solicitud', 'Tipo de Solicitud', 'Cliente', 'Sede', 'Fecha', 'Ciudad', 'Dirección', 'Persona de Contacto', 'Teléfono', 'Serial', 'Tipo máquina', 'Marca', 'Referencia', 'Gestionar'],
+            widthArr: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
             data: [],
             loading: false
         }
@@ -48,10 +48,10 @@ class BodyLanding extends Component {
                 solicitud.TipoSolicitud,
                 solicitud.cliente,
                 solicitud.sede,
+                solicitud.fecha,
                 solicitud.Direccion,
                 solicitud.ContactoSede,
                 solicitud.TelefonoSede,
-                solicitud.fecha,
                 solicitud.Serial,
                 solicitud.TipoMaquina,
                 solicitud.Marca,
