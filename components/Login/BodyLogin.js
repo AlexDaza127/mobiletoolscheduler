@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 //dependencias
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground, Image, AsyncStorage } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground, Image, AsyncStorage, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import base64 from 'react-native-base64'
 
@@ -42,26 +42,31 @@ class BodyLogin extends Component {
 
                 const datos = await apiBasic('POST', 'auth-login/token', credenciales);
 
-
                 if (datos.accessToken) {
                     const tokenSplit = datos.accessToken.split('.');
-                    const usuario = JSON.parse(base64.decode(tokenSplit[1]));
-                    if(usuario.rol === 'tecnico'){
+                    /*
+                        Se realiza esta conversión tan larga, debido a los caracteres no imprimibles o nulos que se producen
+                        según algunos artículos en internet por Android. Se deben eliminar caracteres \u0000.
+                        El problema no es del back-end, desde ahí se envían bien.
+                        Para visualizar los caracteres puede hacer un console.log(JSON.stringify(base64.decode(tokenSplit[1])))
+                    */
+                    const usuario = JSON.parse(JSON.parse(JSON.stringify(base64.decode(tokenSplit[1])).replace(/\\u([0-9]|[a-fA-F])([0-9]|[a-fA-F])([0-9]|[a-fA-F])([0-9]|[a-fA-F])/g, '')));
+                    if (usuario.rol === 'tecnico' || usuario.tipoUsuario === 2) {
                         await AsyncStorage.setItem('token', datos.accessToken);
                         this.props.navegar.navigate('Details');
                     }
-                    else{
-                        alert('Aplicación exclusiva para técnicos');
+                    else {
+                        Alert.alert('Aplicación exclusiva para técnicos');
                     }
                 } else {
-                    alert(datos.error);
+                    Alert.alert(datos.error);
                 }
                 this.setState({ loading: false });
             } else {
-                alert('Digite todos los datos')
+                Alert.alert('Digite todos los datos')
             }
         } catch (error) {
-
+            console.log(error);
         }
     }
 
@@ -79,16 +84,15 @@ class BodyLogin extends Component {
                     </Text>
                     <TextInput
                         style={[styles.inputs, styles.alinear]}
-                        placeholder="Digite su Usuario"
+                        placeholder="Digite su usuario"
                         keyboardType='email-address'
                         onChangeText={(user) => this.setState({ user })}
                         value={this.state.user}
                     ></TextInput>
                     <TextInput
                         style={[styles.inputs, styles.alinear]}
-                        placeholder="Digite su Clave"
+                        placeholder="Digite su clave"
                         secureTextEntry={true}
-                        keyboardType='numeric'
                         onChangeText={(pass) => this.setState({ pass })}
                         value={this.state.pass}
                     ></TextInput>

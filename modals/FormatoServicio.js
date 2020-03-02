@@ -90,12 +90,12 @@ class FormatoServicio extends Component {
                 });
             }
             else {
-                alert('No fue posible traer datos de del detallado de la solicitud');
+                Alert.alert('No fue posible traer datos de del detallado de la solicitud');
             }
             this.setState({ loading: false });
         }
         catch (error) {
-            alert('Error en servidor');
+            Alert.alert('Error en servidor');
         }
     }
 
@@ -147,8 +147,8 @@ class FormatoServicio extends Component {
                         value={this.state.Observaciones}
                     ></TextInput>
 
-                    {/* checkbox para el semaforo de las solicitudes */}
-                    <Text style={styles.text}>Semáforo</Text>
+                    {/* Checkbox para estado de las observaciones */}
+                    <Text style={styles.text}>Clasificar el estado la observación anterior</Text>
                     <View style={styles.checksSemaforos}>
                         <CheckBox
                             value={this.state.optimo}
@@ -161,7 +161,7 @@ class FormatoServicio extends Component {
                             checkBoxColor={"green"}
                         >
                         </CheckBox>
-                        <Text style={{ color: 'green' }}> Optimo</Text>
+                        <Text style={{ color: 'green' }}> Óptimo</Text>
                     </View>
                     <View style={styles.checksSemaforos}>
                         <CheckBox
@@ -189,7 +189,7 @@ class FormatoServicio extends Component {
                             checkBoxColor={"red"}
                         >
                         </CheckBox>
-                        <Text style={{ color: 'red' }}> Critico</Text>
+                        <Text style={{ color: 'red' }}> Crítico</Text>
                     </View>
 
                     {/* //////////////////////////////// */}
