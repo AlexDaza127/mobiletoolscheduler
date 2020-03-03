@@ -8,6 +8,8 @@ import CheckBox from 'react-native-check-box';
 import { api } from '../functions/api';
 import Loader from '../functions/Loader';
 import FileLoad from '../functions/FileLoad';
+import { REACT_APP_FILE_URL } from 'react-native-dotenv';
+
 
 class FormatoEntrega extends Component {
     constructor(props) {
@@ -29,6 +31,7 @@ class FormatoEntrega extends Component {
             Status: false,
             loading: false
         };
+        this.urlGn = REACT_APP_FILE_URL;
     }
 
     //método que permite capturar la firma 
@@ -128,7 +131,7 @@ class FormatoEntrega extends Component {
                 this.setState({
                     ...datosSolicitud,
                     Status: datosSolicitud.Status === 10 ? true : false,
-                    FirmaEncargado: datosSolicitud.FirmaEncargado ? `http://192.168.1.7:8000/gn/${datosSolicitud.FirmaEncargado}` : false
+                    FirmaEncargado: datosSolicitud.FirmaEncargado ? `${this.urlGn}/${datosSolicitud.FirmaEncargado}` : false
                 });
             }
             this.setState({ loading: false });

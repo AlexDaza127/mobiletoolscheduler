@@ -1,10 +1,11 @@
 import { AsyncStorage } from 'react-native';
+import { REACT_APP_API_URL } from 'react-native-dotenv';
 
 //Función de petición general
 async function request(method, url, body, auth, upload) {
     try {
         //URL de ambiente para hacer peticiones al back
-        const urlApi = 'http://192.168.1.7:8000/api';
+        const urlApi = REACT_APP_API_URL;
 
         //Opciones de petición
         const requestOptions = {

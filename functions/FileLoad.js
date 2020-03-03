@@ -6,6 +6,7 @@ import * as ImagePicker from 'expo-image-picker';
 import Constants from 'expo-constants';
 import * as Permissions from 'expo-permissions';
 import { FontAwesome } from '@expo/vector-icons';
+import { REACT_APP_FILE_URL } from 'react-native-dotenv';
 
 class FileLoad extends Component {
     constructor(props) {
@@ -14,6 +15,7 @@ class FileLoad extends Component {
             conArchivo: (this.props.value) ? true : false,
             foto: {}
         }
+        this.urlGn = REACT_APP_FILE_URL;
     }
 
     handleCargar = () => {
@@ -72,7 +74,7 @@ class FileLoad extends Component {
                         }}>
                             <Text style={this.props.styles.buttonReload}><FontAwesome name="repeat" size={20} /> Volver a cargar</Text>
                         </TouchableOpacity>
-                        <Image source={{ uri: `http://192.168.1.7:8000/gn/${this.props.value}` }} style={this.props.styles.imagenes} />
+                        <Image source={{ uri: `${this.urlGn}/${this.props.value}` }} style={this.props.styles.imagenes} />
                     </View>
                 </>
 

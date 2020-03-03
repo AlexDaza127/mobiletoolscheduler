@@ -7,6 +7,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import CheckBox from 'react-native-check-box';
 import { api } from '../functions/api';
 import Loader from '../functions/Loader';
+import { REACT_APP_FILE_URL } from 'react-native-dotenv';
 
 class FormatoServicio extends Component {
     constructor(props) {
@@ -29,6 +30,8 @@ class FormatoServicio extends Component {
             RecomendVerd: false,
             loading: false
         };
+        this.urlGn = REACT_APP_FILE_URL;
+
     }
 
 
@@ -127,7 +130,9 @@ class FormatoServicio extends Component {
                 //Se actualizan los datos en el estado para poderse mostrar en el formulario
                 const solicitudesDet = datos.data[0];
                 this.setState({
-                    ...solicitudesDet
+                    ...solicitudesDet,
+                    FirmaEncargado: solicitudesDet.FirmaEncargado ? `${this.urlGn}/${solicitudesDet.FirmaEncargado}` : false
+
                 });
             }
             else {
