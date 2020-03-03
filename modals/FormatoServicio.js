@@ -343,7 +343,9 @@ class FormatoServicio extends Component {
                         {this.state.FirmaEncargado &&
                             <Image
                                 source={{ uri: this.state.FirmaEncargado }}
-                                style={styles.imagenes} />
+                                style={styles.imagenes}
+                                reload
+                            />
                         }
                     </View>
 

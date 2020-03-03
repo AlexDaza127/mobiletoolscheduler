@@ -206,7 +206,9 @@ class FormatoEntrega extends Component {
                         {this.state.FirmaEncargado &&
                             <Image
                                 source={{ uri: this.state.FirmaEncargado }}
-                                style={styles.imagenes} />
+                                style={styles.imagenes}
+                                reload
+                            />
                         }
                     </View>
 
@@ -262,7 +264,7 @@ class FormatoEntrega extends Component {
                             checkBoxColor={"green"}
                         >
                         </CheckBox>
-                        <Text style={{ color: 'green' }}> Optimo</Text>
+                        <Text style={{ color: 'green' }}> Óptimo</Text>
                     </View>
 
                     <Text style={styles.text}>Instalada</Text>
