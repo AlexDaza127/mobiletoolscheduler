@@ -33,7 +33,7 @@ class FormatoEntrega extends Component {
 
     //método que permite capturar la firma 
     handleSignature = () => {
-        this.props.navegar.navigate('firmaC');
+        this.props.navegar.navigate('firmaC', { origen: 'formatoE' });
     };
 
     //Método para capturar las imágenes
@@ -169,6 +169,7 @@ class FormatoEntrega extends Component {
                     <TextInput
                         style={[styles.inputs, styles.alinear]}
                         placeholder='Serial'
+                        maxLength={45}
                         onChangeText={(Serial) => this.setState({ Serial })}
                         value={this.state.Serial}
                     ></TextInput>
@@ -208,10 +209,13 @@ class FormatoEntrega extends Component {
 
                     <Text style={styles.text}>Observaciones</Text>
                     <TextInput
-                        style={[styles.inputs, styles.alinear]}
+                        style={[styles.inputsLg, styles.alinear]}
                         placeholder="Observaciones"
                         onChangeText={(Observaciones) => this.setState({ Observaciones })}
+                        maxLength={255}
                         value={this.state.Observaciones}
+                        multiline
+                        numberOfLines={2}
                     ></TextInput>
 
                     {/* Checkbox para el estado de las observaciones */}
@@ -318,6 +322,15 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingVertical: 15,
         height: 50,
+        borderColor: 'gray',
+        borderWidth: 1,
+        borderRadius: 25,
+        backgroundColor: '#fff',
+        marginHorizontal: 20
+    },
+    inputsLg: {
+        paddingHorizontal: 20,
+        paddingVertical: 15,
         borderColor: 'gray',
         borderWidth: 1,
         borderRadius: 25,

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 import Signature from 'react-native-signature-canvas';
-import { FontAwesome } from '@expo/vector-icons';
 
 
 class SignatureCliente extends Component {
@@ -12,7 +11,7 @@ class SignatureCliente extends Component {
 
 
     mandarFirma = (signature) => {
-        this.props.navegar.navigate('formatoE', { firma: signature });
+        this.props.navegar.navigate(this.props.origen, { firma: signature });
     }
 
     render() {
@@ -35,6 +34,5 @@ class SignatureCliente extends Component {
         );
     }
 }
-
 
 export default SignatureCliente;

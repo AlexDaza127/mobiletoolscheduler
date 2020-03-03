@@ -10,7 +10,6 @@ import BodyLanding from '../components/Views/BodyLanding';
 import FormatoServicio from '../modals/FormatoServicio';
 import FormatoEntrega from '../modals/FormatoEntrega';
 import SignatureCliente from '../functions/SignatureCliente';
-import SignatureClienteServ from '../functions/SignatureClienteServicio';
 
 function Login({ navigation }) {
     return (
@@ -27,15 +26,10 @@ function formatoServicio({ route, navigation }) {
     );
 }
 
-function firmaCliente({ navigation }) {
+function firmaCliente({ route, navigation }) {
+    const { origen } = route.params;
     return (
-        <SignatureCliente navegar={navigation}></SignatureCliente>
-    );
-}
-
-function firmaClienteServicio({ navigation }) {
-    return (
-        <SignatureClienteServ navegar={navigation}></SignatureClienteServ>
+        <SignatureCliente navegar={navigation} origen={origen}></SignatureCliente>
     );
 }
 
@@ -103,10 +97,6 @@ function Routes() {
                 <Stack.Screen
                     name="firmaC"
                     component={firmaCliente}
-                />
-                <Stack.Screen
-                    name="firmaCS"
-                    component={firmaClienteServicio}
                 />
             </Stack.Navigator>
         </NavigationContainer>
