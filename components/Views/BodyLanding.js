@@ -8,9 +8,11 @@ import Loader from '../../functions/Loader';
 class BodyLanding extends Component {
     constructor(props) {
         super(props);
+        const headersTabla = ['N° Solicitud', 'Tipo de Solicitud', 'Cliente', 'Sede', 'Fecha', 'Ciudad', 'Dirección', 'Persona de Contacto', 'Teléfono', 'Serial', 'Tipo máquina', 'Marca', 'Referencia', 'Gestionar'];
+        const widthColumnas = headersTabla.map(()=> 200);
         this.state = {
-            tableHead: ['N° Solicitud', 'Tipo de Solicitud', 'Cliente', 'Sede', 'Fecha', 'Ciudad', 'Dirección', 'Persona de Contacto', 'Teléfono', 'Serial', 'Tipo máquina', 'Marca', 'Referencia', 'Gestionar'],
-            widthArr: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+            tableHead: headersTabla,
+            widthArr: widthColumnas,
             data: [],
             loading: false
         }
@@ -42,6 +44,7 @@ class BodyLanding extends Component {
     }
 
     llenarTabla(datos) {
+        //Por cada registro se hace un nuevo arreglo con botón para la tabla
         const arraySolicitudes = datos.map((solicitud) => {
             const arregloSolicitud = [
                 solicitud.id,
@@ -49,6 +52,7 @@ class BodyLanding extends Component {
                 solicitud.cliente,
                 solicitud.sede,
                 solicitud.fecha,
+                solicitud.Ciudad,
                 solicitud.Direccion,
                 solicitud.ContactoSede,
                 solicitud.TelefonoSede,

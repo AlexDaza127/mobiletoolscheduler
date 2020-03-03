@@ -23,6 +23,11 @@ class BodyLogin extends Component {
         };
 
         this.handlePress = this.handlePress.bind(this);
+        this.removeStorage();
+    }
+    
+    removeStorage = async () => {
+        await AsyncStorage.removeItem('token');
     }
 
     //método que permite verificar las credenciales del usuario en la base de datos
@@ -51,6 +56,7 @@ class BodyLogin extends Component {
                         Para visualizar los caracteres puede hacer un console.log(JSON.stringify(base64.decode(tokenSplit[1])))
                     */
                     const usuario = JSON.parse(JSON.parse(JSON.stringify(base64.decode(tokenSplit[1])).replace(/\\u([0-9]|[a-fA-F])([0-9]|[a-fA-F])([0-9]|[a-fA-F])([0-9]|[a-fA-F])/g, '')));
+                    //Se permite ingreso a los roles técnicos y al tipo de usuario 2 = Jefe de servicio
                     if (usuario.rol === 'tecnico' || usuario.tipoUsuario === 2) {
                         await AsyncStorage.setItem('token', datos.accessToken);
                         this.props.navegar.navigate('Details');
@@ -125,6 +131,7 @@ const styles = StyleSheet.create({
     },
     inputs: {
         paddingHorizontal: 20,
+        width:200,
         height: 40,
         borderColor: 'gray',
         borderWidth: 1,

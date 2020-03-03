@@ -3,12 +3,11 @@ import {
     Text, View, Alert, StyleSheet,
     TouchableOpacity, TextInput, ScrollView, Image
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import Constants from 'expo-constants';
-import * as Permissions from 'expo-permissions';
 import { FontAwesome } from '@expo/vector-icons';
 import CheckBox from 'react-native-check-box';
 import { api } from '../functions/api';
+import Loader from '../functions/Loader';
+import FileLoad from '../functions/FileLoad';
 
 class FormatoEntrega extends Component {
     constructor(props) {
@@ -19,19 +18,17 @@ class FormatoEntrega extends Component {
             Marca: '',
             Referencia: '',
             Serial: '',
-            FotoSerial: null,
+            FotoSerial: '',
+            FotoVista: '',
             FirmaEncargado: null,
             image: null,
             checkedCostoM: false,
-            checkedCostoMAct: 0,
             NoInst: false,
-            NoInstAct: 0,
             optimo: false,
-            optimoAct: 0,
             critico: false,
-            criticoAct: 0,
             precaucion: false,
-            precaucionAct: 0
+            instalada: false,
+            loading: false
         };
     }
 
@@ -39,6 +36,11 @@ class FormatoEntrega extends Component {
     handleSignature = () => {
         this.props.navegar.navigate('firmaC');
     };
+
+    //Método para capturar las imágenes
+    handleCapturarImagen = (objImagen) => {
+        console.log(objImagen);
+    }
 
     //método que permite actualizar el state para la firma y que a su vez se muestre en el front-end del celular
     cargarFirma = () => {
@@ -59,15 +61,17 @@ class FormatoEntrega extends Component {
                 for (const key in this.state) {
                     formulario.append(key, this.state[key]);
                 }
+                this.setState({ loading: true });
 
                 //Se realiza petición
                 const datos = await api('PUT', `solicitudes-movil/actualizar-servicio/instalacion`, formulario, true);
 
                 Alert.alert(datos.mensaje);
 
-                if(datos.estado){
+                if (datos.estado) {
                     //this.props.navegar.navigate('Details')
                 }
+                this.setState({ loading: false });
             } else {
                 Alert.alert(`¡Faltan campos por validar!`);
             }
@@ -80,47 +84,21 @@ class FormatoEntrega extends Component {
 
     //método que permite actualizar los permisos del movil para la exploración de imágenes desde la app
     componentDidMount() {
-        this.getPermissionAsync();
         this.traerDatosSolicitudEntrega();
     }
 
-    componentDidUpdate(prevProps){
-        if(prevProps.rutas.firma !== this.props.rutas.firma){
+    componentDidUpdate(prevProps) {
+        if (prevProps.rutas.firma !== this.props.rutas.firma) {
             this.cargarFirma();
         }
 
     }
 
-    //método que genera la petición del permiso para la exploración de imágenes desde la app
-    getPermissionAsync = async () => {
-        if (Constants.platform.ios) {
-            const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-            if (status !== 'granted') {
-                alert('Necesita dar permiso a la aplicación para acceder a la galería de fotos');
-            }
-        }
-    }
-
-    //método que permite actualizar el state para la foto de la serial y que a su vez se muestre en el front-end del movil
-    _pickImage = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            quality: 1
-        });
-        if (!result.cancelled) {
-            this.setState({ image: result.uri });
-            //Se extrae extensión de la imagen
-            const extension = result.uri.split('.').pop();
-            //Se realiza guardado de imagen en el formato para indicar que es un archivo
-            this.setState({ FotoSerial: { uri: result.uri, name: `FotoSerial.${extension}`, type: 'image/*' } });
-        }
-    };
-
     async traerDatosSolicitudEntrega() {
         try {
             this.setState({ loading: true });
             const datos = await api('GET', `solicitudes-movil/solicitudes-detalle/asignacion/${this.props.id}`);
+
             if (datos.estado) {
                 this.setState({ ...datos.data[0] });
             }
@@ -130,6 +108,9 @@ class FormatoEntrega extends Component {
     }
 
     render() {
+        if (this.state.loading) {
+            return <Loader />;
+        }
         return (
             <View>
                 <ScrollView>
@@ -137,22 +118,22 @@ class FormatoEntrega extends Component {
 
                     <Text style={styles.text}>Tipo de Máquina</Text>
                     <Text
-                        style={[styles.inputs, styles.alinear]}
+                        style={[styles.inputs, styles.alinear, styles.inputsDisabled]}
                     >{this.state.TipoMaquina}</Text>
 
                     <Text style={styles.text}>Marca</Text>
                     <Text
-                        style={[styles.inputs, styles.alinear]}
+                        style={[styles.inputs, styles.alinear, styles.inputsDisabled]}
                     >{this.state.Marca}</Text>
 
                     <Text style={styles.text}>Referencia</Text>
                     <Text
-                        style={[styles.inputs, styles.alinear]}
+                        style={[styles.inputs, styles.alinear, styles.inputsDisabled]}
                     >{this.state.Referencia}</Text>
 
                     <Text style={styles.text}>Modelo</Text>
                     <Text
-                        style={[styles.inputs, styles.alinear]}
+                        style={[styles.inputs, styles.alinear, styles.inputsDisabled]}
                     >{this.state.Modelo}</Text>
 
                     <Text style={styles.text}>Serial</Text>
@@ -163,20 +144,28 @@ class FormatoEntrega extends Component {
                         value={this.state.Serial}
                     ></TextInput>
 
-                    {/* Boton para subir la foto de la serial */}
+                    {/* Componente para subir la foto de la serial */}
                     <Text style={styles.text}>Foto Serial</Text>
-                    <TouchableOpacity onPress={this._pickImage}>
-                        <Text style={styles.button}><FontAwesome name="upload" size={20}></FontAwesome> Subir Foto</Text>
-                    </TouchableOpacity>
-                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        {this.state.image &&
-                            <Image source={{ uri: this.state.image }} style={styles.imagenes} />}
-                    </View>
-                    
+                    <FileLoad
+                        value={this.state.FotoSerial}
+                        name="FotoSerial"
+                        styles={styles}
+                        onCapturarImagen={(objImagen) => this.handleCapturarImagen(objImagen)}
+                    />
+
+                    {/* Componente para subir la foto de la vista de la máquina instalada */}
+                    <Text style={styles.text}>Foto Serial</Text>
+                    <FileLoad
+                        value={this.state.FotoSerial}
+                        name="FotoVista"
+                        styles={styles}
+                        onCapturarImagen={(objImagen) => this.handleCapturarImagen(objImagen)}
+                    />
+
                     {/* Aqui va la firma cliente */}
                     <Text style={styles.text}>Firma Cliente</Text>
                     <TouchableOpacity onPress={this.handleSignature}>
-                        <Text style={styles.button}><FontAwesome name="pencil" size={20}></FontAwesome>  Tomar Firma</Text>
+                        <Text style={styles.button}><FontAwesome name="pencil" size={20}></FontAwesome> Tomar Firma</Text>
                     </TouchableOpacity>
 
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -196,42 +185,13 @@ class FormatoEntrega extends Component {
                         value={this.state.Observaciones}
                     ></TextInput>
                     {/* Checkbox para el estado de las observaciones */}
-                    <Text style={styles.text}>Estado de las observaciones</Text>
-                    <View style={styles.checksSemaforos}>
-                        <CheckBox
-                            value={this.state.optimo}
-                            onClick={() =>
-                                this.setState({
-                                    optimo: !this.state.optimo,
-                                    optimoAct: this.state.optimo ? 0 : 1
-                                })}
-                            isChecked={this.state.optimo}
-                            checkBoxColor={"green"}
-                        >
-                        </CheckBox>
-                        <Text style={{ color: 'green' }}> Optimo</Text>
-                    </View>
-                    <View style={styles.checksSemaforos}>
-                        <CheckBox
-                            value={this.state.precaucion}
-                            onClick={() =>
-                                this.setState({
-                                    precaucion: !this.state.precaucion,
-                                    precaucionAct: this.state.precaucion ? 0 : 1
-                                })}
-                            isChecked={this.state.precaucion}
-                            checkBoxColor={"orange"}
-                        >
-                        </CheckBox>
-                        <Text style={{ color: 'orange' }}> Precaución</Text>
-                    </View>
+                    <Text style={styles.text}>Estado de la observación anterior</Text>
                     <View style={styles.checksSemaforos}>
                         <CheckBox
                             value={this.state.critico}
                             onClick={() =>
                                 this.setState({
                                     critico: !this.state.critico,
-                                    criticoAct: this.state.critico ? 0 : 1
                                 })}
                             isChecked={this.state.critico}
                             checkBoxColor={"red"}
@@ -240,53 +200,78 @@ class FormatoEntrega extends Component {
                         <Text style={{ color: 'red' }}> Critico</Text>
                     </View>
 
+                    <View style={styles.checksSemaforos}>
+                        <CheckBox
+                            value={this.state.precaucion}
+                            onClick={() =>
+                                this.setState({
+                                    precaucion: !this.state.precaucion,
+                                })}
+                            isChecked={this.state.precaucion}
+                            checkBoxColor={"orange"}
+                        >
+                        </CheckBox>
+                        <Text style={{ color: 'orange' }}> Precaución</Text>
+                    </View>
+
+                    <View style={styles.checksSemaforos}>
+                        <CheckBox
+                            value={this.state.optimo}
+                            onClick={() =>
+                                this.setState({
+                                    optimo: !this.state.optimo,
+                                })}
+                            isChecked={this.state.optimo}
+                            checkBoxColor={"green"}
+                        >
+                        </CheckBox>
+                        <Text style={{ color: 'green' }}> Optimo</Text>
+                    </View>
 
                     <Text style={styles.text}>Instalada</Text>
                     <View style={styles.checks}>
                         <CheckBox
-                            value={this.state.checkedCostoM}
+                            value={this.state.instalada}
                             onClick={() =>
                                 this.setState({
-                                    checkedCostoM: !this.state.checkedCostoM,
-                                    checkedCostoMAct: this.state.Status === 10 ? 1 : 0
+                                    instalada: !this.state.instalada,
                                 })}
-                            isChecked={this.state.checkedCostoM === 10}
+                            isChecked={this.state.instalada}
                             checkBoxColor={"black"}
                         >
                         </CheckBox>
                     </View>
 
-                    <Text style={styles.text}>No Requirió Instalación</Text>
+                    <Text style={styles.text}>No requirió instalación</Text>
                     <View style={styles.checks}>
                         <CheckBox
                             value={this.state.NoInst}
                             onClick={() =>
                                 this.setState({
                                     NoInst: !this.state.NoInst,
-                                    NoInstAct: this.state.NoInst ? 0 : 1
                                 })}
-                            isChecked={this.state.NoInst}
+                            isChecked={this.state.NoInst ? true: false}
                             checkBoxColor={"black"}
                         >
                         </CheckBox>
                     </View>
 
-                    <View>
-                        <TouchableOpacity onPress={() => {
-                            this.cargarDatos()
-                        }}>
-                            <Text style={styles.button}> Guardar</Text>
-                        </TouchableOpacity>
+                <View>
+                    <TouchableOpacity onPress={() => {
+                        this.cargarDatos()
+                    }}>
+                        <Text style={styles.button}> Guardar</Text>
+                    </TouchableOpacity>
 
-                        <TouchableOpacity onPress={() => {
-                            this.props.navegar.navigate('Details')
-                        }}>
-                            <Text style={styles.button}>Cancelar</Text>
-                        </TouchableOpacity>
-                    </View>
+                    <TouchableOpacity onPress={() => {
+                        this.props.navegar.navigate('Details')
+                    }}>
+                        <Text style={styles.button}>Regresar</Text>
+                    </TouchableOpacity>
+                </View>
 
                 </ScrollView>
-            </View>
+            </View >
 
         );
     }
@@ -306,8 +291,12 @@ const styles = StyleSheet.create({
         borderColor: 'gray',
         borderWidth: 1,
         borderRadius: 25,
-        backgroundColor: '#FFF',
+        backgroundColor: '#fff',
         marginHorizontal: 20
+    },
+    inputsDisabled: {
+        backgroundColor: '#e4e4e4',
+
     },
     alinear: {
         marginBottom: 20
@@ -325,6 +314,12 @@ const styles = StyleSheet.create({
         marginBottom: 15,
         marginHorizontal: 100,
         fontSize: 16
+    },
+    buttonReload: {
+        color: '#4dabf7',
+        textAlign: 'center',
+        marginBottom: 10,
+        fontSize: 18
     },
     title: {
         margin: 20,
