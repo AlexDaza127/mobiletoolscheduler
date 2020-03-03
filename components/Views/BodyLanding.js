@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, ScrollView, TouchableOpacity, Text, Alert } from 'react-native';
 import { Table, Row } from 'react-native-table-component';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { api } from '../../functions/api';
@@ -9,7 +9,7 @@ class BodyLanding extends Component {
     constructor(props) {
         super(props);
         const headersTabla = ['N° Solicitud', 'Tipo de Solicitud', 'Cliente', 'Sede', 'Fecha', 'Ciudad', 'Dirección', 'Persona de Contacto', 'Teléfono', 'Serial', 'Tipo máquina', 'Marca', 'Referencia', 'Gestionar'];
-        const widthColumnas = headersTabla.map(()=> 200);
+        const widthColumnas = headersTabla.map(() => 200);
         this.state = {
             tableHead: headersTabla,
             widthArr: widthColumnas,
@@ -37,6 +37,9 @@ class BodyLanding extends Component {
             if (datos.estado) {
                 const tablaSolicitudes = this.llenarTabla(datos.data);
                 this.setState({ data: tablaSolicitudes });
+            }
+            else {
+                Alert.alert(datos.mensaje);
             }
             this.setState({ loading: false });
         } catch (error) {
@@ -79,32 +82,38 @@ class BodyLanding extends Component {
             <ScrollView>
                 <View style={styles.container}>
                     <Text style={styles.textTitulo}>Solicitudes Asignadas</Text>
-                    <ScrollView horizontal={true}>
-                        <View style={styles.tables}>
-                            <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
-                                <Row
-                                    data={this.state.tableHead}
-                                    widthArr={this.state.widthArr}
-                                    style={styles.header}
-                                    textStyle={styles.textHeader} />
-                            </Table>
-                            <ScrollView style={styles.dataWrapper}>
+                    {this.state.data.length > 0 ?
+                        <ScrollView horizontal={true}>
+                            <View style={styles.tables}>
                                 <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
-                                    {
-                                        this.state.data.map((rowData, index) => (
-                                            <Row
-                                                key={index}
-                                                data={rowData}
-                                                widthArr={this.state.widthArr}
-                                                style={[styles.row, index % 2 && { backgroundColor: '#FFF' }]}
-                                                textStyle={styles.text}
-                                            />
-                                        ))
-                                    }
+                                    <Row
+                                        data={this.state.tableHead}
+                                        widthArr={this.state.widthArr}
+                                        style={styles.header}
+                                        textStyle={styles.textHeader} />
                                 </Table>
-                            </ScrollView>
+                                <ScrollView style={styles.dataWrapper}>
+                                    <Table borderStyle={{ borderWidth: 1, borderColor: '#C1C0B9' }}>
+                                        {
+                                            this.state.data.map((rowData, index) => (
+                                                <Row
+                                                    key={index}
+                                                    data={rowData}
+                                                    widthArr={this.state.widthArr}
+                                                    style={[styles.row, index % 2 && { backgroundColor: '#FFF' }]}
+                                                    textStyle={styles.text}
+                                                />
+                                            ))
+                                        }
+                                    </Table>
+                                </ScrollView>
+                            </View>
+                        </ScrollView>
+                        :
+                        <View style={styles.viewNoData}>
+                            <Text style={styles.textNoData}>No tienes Solicitudes Asignadas</Text>
                         </View>
-                    </ScrollView>
+                    }
                 </View>
             </ScrollView>
         )
@@ -151,6 +160,16 @@ const styles = StyleSheet.create({
     row: {
         height: 40,
         backgroundColor: '#f3f3f3'
+    },
+    viewNoData: {
+        backgroundColor: '#f5f5f5',
+        padding: 10,
+        borderRadius: 5
+    },
+    textNoData: {
+        textAlign: 'center',
+        fontWeight: "bold",
+        fontSize: 15
     }
 });
 

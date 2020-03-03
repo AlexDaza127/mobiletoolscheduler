@@ -20,14 +20,13 @@ class FormatoEntrega extends Component {
             Serial: '',
             FotoSerial: '',
             FotoVista: '',
+            Observaciones: '',
             FirmaEncargado: null,
-            image: null,
-            checkedCostoM: false,
             NoInst: false,
-            optimo: false,
-            critico: false,
-            precaucion: false,
-            instalada: false,
+            RecomendRojo: false,
+            RecomendAmar: false,
+            RecomendVerd: false,
+            Status: false,
             loading: false
         };
     }
@@ -39,7 +38,9 @@ class FormatoEntrega extends Component {
 
     //Método para capturar las imágenes
     handleCapturarImagen = (objImagen) => {
-        console.log(objImagen);
+        this.setState({
+            ...objImagen
+        });
     }
 
     //método que permite actualizar el state para la firma y que a su vez se muestre en el front-end del celular
@@ -54,13 +55,15 @@ class FormatoEntrega extends Component {
     async cargarDatos() {
         try {
             if (
-                true
+                this.state.FotoSerial &&
+                this.state.FotoVista &&
+                this.state.Serial &&
+                this.state.Observaciones &&
+                this.state.FirmaEncargado
             ) {
                 //Se crea formdata para subir información junto con las imágenes
-                const formulario = new FormData();
-                for (const key in this.state) {
-                    formulario.append(key, this.state[key]);
-                }
+                const formulario = this.capturarFormulario();
+
                 this.setState({ loading: true });
 
                 //Se realiza petición
@@ -69,8 +72,9 @@ class FormatoEntrega extends Component {
                 Alert.alert(datos.mensaje);
 
                 if (datos.estado) {
-                    //this.props.navegar.navigate('Details')
+                    this.props.navegar.navigate('Details')
                 }
+
                 this.setState({ loading: false });
             } else {
                 Alert.alert(`¡Faltan campos por validar!`);
@@ -94,13 +98,38 @@ class FormatoEntrega extends Component {
 
     }
 
+    capturarFormulario = () => {
+        const formulario = new FormData();
+
+        formulario.append('idSolicitudesDet', this.props.id);
+        formulario.append('idMaquinaSede', this.state.idMaquinaSede);
+        formulario.append('FotoSerial', this.state.FotoSerial);
+        formulario.append('FotoVista', this.state.FotoVista);
+        formulario.append('Serial', this.state.Serial);
+        formulario.append('Observaciones', this.state.Observaciones);
+        formulario.append('FirmaEncargado', this.state.FirmaEncargado);
+        //Se verifican los checkbox
+        formulario.append('NoInst', this.state.NoInst ? 1 : 0);
+        formulario.append('RecomendRojo', this.state.RecomendRojo ? 1 : 0);
+        formulario.append('RecomendAmar', this.state.RecomendAmar ? 1 : 0);
+        formulario.append('RecomendVerd', this.state.RecomendVerd ? 1 : 0);
+        formulario.append('Status', this.state.Status ? 1 : 0);
+
+        return formulario;
+    }
+
     async traerDatosSolicitudEntrega() {
         try {
             this.setState({ loading: true });
             const datos = await api('GET', `solicitudes-movil/solicitudes-detalle/asignacion/${this.props.id}`);
 
             if (datos.estado) {
-                this.setState({ ...datos.data[0] });
+                const datosSolicitud = datos.data[0];
+                this.setState({
+                    ...datosSolicitud,
+                    Status: datosSolicitud.Status === 10 ? true : false,
+                    FirmaEncargado: datosSolicitud.FirmaEncargado ? `http://192.168.1.7:8000/gn/${datosSolicitud.FirmaEncargado}` : false
+                });
             }
             this.setState({ loading: false });
         } catch (error) {
@@ -154,9 +183,9 @@ class FormatoEntrega extends Component {
                     />
 
                     {/* Componente para subir la foto de la vista de la máquina instalada */}
-                    <Text style={styles.text}>Foto Serial</Text>
+                    <Text style={styles.text}>Foto Máquina</Text>
                     <FileLoad
-                        value={this.state.FotoSerial}
+                        value={this.state.FotoVista}
                         name="FotoVista"
                         styles={styles}
                         onCapturarImagen={(objImagen) => this.handleCapturarImagen(objImagen)}
@@ -184,16 +213,17 @@ class FormatoEntrega extends Component {
                         onChangeText={(Observaciones) => this.setState({ Observaciones })}
                         value={this.state.Observaciones}
                     ></TextInput>
+
                     {/* Checkbox para el estado de las observaciones */}
                     <Text style={styles.text}>Estado de la observación anterior</Text>
                     <View style={styles.checksSemaforos}>
                         <CheckBox
-                            value={this.state.critico}
+                            value={this.state.RecomendRojo}
                             onClick={() =>
                                 this.setState({
-                                    critico: !this.state.critico,
+                                    RecomendRojo: !this.state.RecomendRojo,
                                 })}
-                            isChecked={this.state.critico}
+                            isChecked={this.state.RecomendRojo ? true : false}
                             checkBoxColor={"red"}
                         >
                         </CheckBox>
@@ -202,12 +232,12 @@ class FormatoEntrega extends Component {
 
                     <View style={styles.checksSemaforos}>
                         <CheckBox
-                            value={this.state.precaucion}
+                            value={this.state.RecomendAmar}
                             onClick={() =>
                                 this.setState({
-                                    precaucion: !this.state.precaucion,
+                                    RecomendAmar: !this.state.RecomendAmar,
                                 })}
-                            isChecked={this.state.precaucion}
+                            isChecked={this.state.RecomendAmar ? true : false}
                             checkBoxColor={"orange"}
                         >
                         </CheckBox>
@@ -216,12 +246,12 @@ class FormatoEntrega extends Component {
 
                     <View style={styles.checksSemaforos}>
                         <CheckBox
-                            value={this.state.optimo}
+                            value={this.state.RecomendVerd}
                             onClick={() =>
                                 this.setState({
-                                    optimo: !this.state.optimo,
+                                    RecomendVerd: !this.state.RecomendVerd,
                                 })}
-                            isChecked={this.state.optimo}
+                            isChecked={this.state.RecomendVerd ? true : false}
                             checkBoxColor={"green"}
                         >
                         </CheckBox>
@@ -231,12 +261,12 @@ class FormatoEntrega extends Component {
                     <Text style={styles.text}>Instalada</Text>
                     <View style={styles.checks}>
                         <CheckBox
-                            value={this.state.instalada}
+                            value={this.state.Status}
                             onClick={() =>
                                 this.setState({
-                                    instalada: !this.state.instalada,
+                                    Status: !this.state.Status,
                                 })}
-                            isChecked={this.state.instalada}
+                            isChecked={this.state.Status ? true : false}
                             checkBoxColor={"black"}
                         >
                         </CheckBox>
@@ -250,25 +280,25 @@ class FormatoEntrega extends Component {
                                 this.setState({
                                     NoInst: !this.state.NoInst,
                                 })}
-                            isChecked={this.state.NoInst ? true: false}
+                            isChecked={this.state.NoInst ? true : false}
                             checkBoxColor={"black"}
                         >
                         </CheckBox>
                     </View>
 
-                <View>
-                    <TouchableOpacity onPress={() => {
-                        this.cargarDatos()
-                    }}>
-                        <Text style={styles.button}> Guardar</Text>
-                    </TouchableOpacity>
+                    <View>
+                        <TouchableOpacity onPress={() => {
+                            this.cargarDatos()
+                        }}>
+                            <Text style={styles.button}> Guardar</Text>
+                        </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => {
-                        this.props.navegar.navigate('Details')
-                    }}>
-                        <Text style={styles.button}>Regresar</Text>
-                    </TouchableOpacity>
-                </View>
+                        <TouchableOpacity onPress={() => {
+                            this.props.navegar.navigate('Details')
+                        }}>
+                            <Text style={styles.button}>Regresar</Text>
+                        </TouchableOpacity>
+                    </View>
 
                 </ScrollView>
             </View >
