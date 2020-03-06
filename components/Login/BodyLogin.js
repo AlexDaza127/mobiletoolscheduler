@@ -57,7 +57,7 @@ class BodyLogin extends Component {
                     */
                     const usuario = JSON.parse(JSON.parse(JSON.stringify(base64.decode(tokenSplit[1])).replace(/\\u([0-9]|[a-fA-F])([0-9]|[a-fA-F])([0-9]|[a-fA-F])([0-9]|[a-fA-F])/g, '')));
                     //Se permite ingreso a los roles técnicos y al tipo de usuario 2 = Jefe de servicio
-                    if (usuario.rol === 'tecnico' || usuario.tipoUsuario === 2) {
+                    if (usuario.rol === 'tecnico' || usuario.rol === 'admin') {
                         await AsyncStorage.setItem('token', datos.accessToken);
                         this.props.navegar.navigate('Details');
                     }
